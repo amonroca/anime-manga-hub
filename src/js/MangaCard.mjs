@@ -1,11 +1,13 @@
 import { getCharacters, getDetails } from "./api";
+import { isFavorite, addFavorite, removeFavorite } from "./utils.js";
 
-export function mangaCardTemplate(item) {
+function mangaCardTemplate(item) {
   const chapters = item.chapters ? `Chapters: ${item.chapters}` : '';
   const volumes = item.volumes ? `Volumes: ${item.volumes}` : '';
   const score = item.score ? `Score: ${item.score}` : 'N/A';
   const genres = item.genres ? `Genres: ${item.genres.map(g => g.name).join(', ')}` : '';
   const synopsis = (item.synopsis || 'No synopsis available.').slice(0, 140) + (item.synopsis && item.synopsis.length > 140 ? '...' : '');
+  const fav = isFavorite(item.mal_id);
   return `
     <div class="card-title">${item.title}</div>
     <div class="card-info">
@@ -21,6 +23,7 @@ export function mangaCardTemplate(item) {
       </div>
       <div class="card-actions">
         <button class="show-details">Details</button>
+        <button class="favorite-btn" data-fav="${fav ? '1' : '0'}">${fav ? '★ Favorito' : '☆ Favoritar'}</button>
       </div>
     </div>
   `;
@@ -34,6 +37,24 @@ export default class MangaCard {
 
   render() {
     return mangaCardTemplate(this.item);
+  }
+
+  bindFavoriteButton(cardElem) {
+    const favBtn = cardElem.querySelector('.favorite-btn');
+    if (!favBtn) return;
+    favBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isFav = isFavorite(this.item.mal_id);
+      if (isFav) {
+        removeFavorite(this.item.mal_id);
+        favBtn.textContent = '☆ Favoritar';
+        favBtn.setAttribute('data-fav', '0');
+      } else {
+        addFavorite(this.item);
+        favBtn.textContent = '★ Favorito';
+        favBtn.setAttribute('data-fav', '1');
+      }
+    });
   }
 
   async showDetails() {

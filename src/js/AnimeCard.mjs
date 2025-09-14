@@ -1,19 +1,20 @@
 import { getCharacters, getDetails, getAnimeStreamingLinks } from "./api";
+import { isFavorite, addFavorite, removeFavorite } from "./utils.js";
 
 function animeCardTemplate(item) {
-  const year = item.year || (item.aired?.from ? new Date(item.aired.from).getFullYear() : 'N/A');
+  const year = `Year: ${item.year || (item.aired?.from ? new Date(item.aired.from).getFullYear() : 'N/A')}`;
   const epOrDur = item.type === 'Movie' ? (item.duration ? `Duration: ${item.duration}` : '') : (item.episodes ? `Episodes: ${item.episodes}` : '');
   const rating = item.rating ? `Rating: ${item.rating}` : '';
   const score = item.score ? `Score: ${item.score}` : 'N/A';
   const genres = item.genres ? `Genres: ${item.genres.map(g => g.name).join(', ')}` : '';
   const synopsis = (item.synopsis || 'No synopsis available.').slice(0, 140) + (item.synopsis && item.synopsis.length > 140 ? '...' : '');
-  
+  const fav = isFavorite(item.mal_id);
   return `
     <div class="card-title">${item.title}</div>
     <div class="card-info">
       <div class="card-meta">
         <img src="${item.images?.jpg?.image_url || ''}" alt="Capa" class="cover-img" />
-        <span>Ano: ${year}</span>
+        <span>${year}</span>
         <span>${epOrDur}</span>
         <span>${score}</span>
         <span>${rating}</span>
@@ -24,7 +25,7 @@ function animeCardTemplate(item) {
       </div>
       <div class="card-actions">
         <button class="show-details">Details</button>
-        <button class="add-watchlist">Add to Watchlist</button>
+        <button class="favorite-btn" data-fav="${fav ? '1' : '0'}">${fav ? '★ Favorite' : '☆ Favorite'}</button>
       </div>
     </div>
   `;
@@ -38,6 +39,24 @@ export default class AnimeCard {
 
   render() {
     return animeCardTemplate(this.item);
+  }
+
+  bindFavoriteButton(cardElem) {
+    const favBtn = cardElem.querySelector('.favorite-btn');
+    if (!favBtn) return;
+    favBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isFav = isFavorite(this.item.mal_id);
+      if (isFav) {
+        removeFavorite(this.item.mal_id);
+        favBtn.textContent = '☆ Favoritar';
+        favBtn.setAttribute('data-fav', '0');
+      } else {
+        addFavorite(this.item);
+        favBtn.textContent = '★ Favorito';
+        favBtn.setAttribute('data-fav', '1');
+      }
+    });
   }
 
   async showDetails() {

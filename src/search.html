@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pesquisa | Anime & Manga Hub</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header>
+    <h1>Search for Anime or Manga</h1>
+  </header>
+  <main>
+    <form id="search-form">
+      <div class="search-bar-wrapper">
+        <input type="text" id="search-input" placeholder="Search anime or manga..." required />
+        <button type="submit" id="search-btn" aria-label="Search">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </button>
+      </div>
+      <select title="Tipo de busca" id="search-type">
+        <option value="anime">Anime</option>
+        <option value="manga">Manga</option>
+      </select>
+    </form>
+    <section id="results-section">
+      <div id="results-list"></div>
+    </section>
+  </main>
+  <div id="details-popup" class="popup-overlay" style="display:none;">
+    <div class="popup-content">
+      <button id="close-popup" aria-label="Fechar">&times;</button>
+      <div id="popup-details-content"></div>
+    </div>
+  </div>
+  <footer></footer>
+  <script type="module" src="js/search.js" defer></script>
+</body>
+</html>

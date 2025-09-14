@@ -1,4 +1,11 @@
-// watchlist.js
+import Menu from "./Menu.mjs";
+import Footer from "./Footer.mjs";
+
+const menu = new Menu('watchlist');
+const footer = new Footer();
+menu.init();
+footer.init();
+
 function getWatchlist() {
   return JSON.parse(localStorage.getItem('watchlist') || '[]');
 }

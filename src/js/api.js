@@ -1,6 +1,25 @@
-// src/api.js
+export async function getKitsuUpcomingAnime(limit = 20) {
+  try {
+    const res = await fetch(`https://kitsu.io/api/edge/anime?sort=-startDate&filter[status]=upcoming&page[limit]=${limit}`);
+    const data = await res.json();
+    return data.data || [];
+  } catch {
+    return [];
+  }
+}
 
-// Busca animes ou mangás por termo
+export async function getKitsuAnimeByIds(ids = []) {
+  if (!ids.length) return [];
+  try {
+    const filter = ids.map(id => `filter[id]=${id}`).join('&');
+    const res = await fetch(`https://kitsu.io/api/edge/anime?${filter}`);
+    const data = await res.json();
+    return data.data || [];
+  } catch {
+    return [];
+  }
+}
+
 export async function searchJikan(query, type) {
   try {
     const res = await fetch(`https://api.jikan.moe/v4/${type}?q=${encodeURIComponent(query)}`);
@@ -11,7 +30,6 @@ export async function searchJikan(query, type) {
   }
 }
 
-// Busca top animes
 export async function getTopAnimes(limit = 20) {
   try {
     const res = await fetch(`https://api.jikan.moe/v4/top/anime?limit=${limit}&limit=20`);
@@ -22,7 +40,6 @@ export async function getTopAnimes(limit = 20) {
   }
 }
 
-// Busca detalhes completos de anime/manga
 export async function getDetails(type, mal_id) {
   try {
     const res = await fetch(`https://api.jikan.moe/v4/${type}/${mal_id}/full`);
@@ -33,7 +50,6 @@ export async function getDetails(type, mal_id) {
   }
 }
 
-// Busca personagens
 export async function getCharacters(type, mal_id) {
   try {
     const res = await fetch(`https://api.jikan.moe/v4/${type}/${mal_id}/characters`);
