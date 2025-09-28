@@ -6,21 +6,83 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Anime & Manga Hub</title>
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/home.css" />
   </head>
   <body>
     <header>
       <h1>Anime & Manga Hub</h1>
     </header>
     <main>
-      <section id="calendar-section">
-        <h2>Calendário de Lançamentos</h2>
-        <div id="calendar-list" class="calendar-list loading">Carregando lançamentos...</div>
+      <!-- 🌟 Recomendações de Anime -->
+      <section id="anime-recommendations" class="section-horizontal">
+        <div class="section-header">
+            <h2>🌟 Anime Recommendations</h2>
+            <div class="filters">
+              <select title="Filter by genre" id="anime-genre-filter"><option value="">Genre</option></select>
+              <select title="Filter by type" id="anime-sort-filter">
+                <option value="popularity">Popularity</option>
+                <option value="season">Season</option>
+              </select>
+              <button id="anime-more-btn">See more recommendations</button>
+            </div>
+        </div>
+        <div id="anime-recommendations-list" class="carousel-list"></div>
       </section>
-      <section id="recommendations-section">
-        <h2>Recomendações para Você</h2>
-        <div id="recommendations-list" class="recommendations-list loading">Carregando recomendações...</div>
+
+      <!-- 📚 Recomendações de Mangá -->
+      <section id="manga-recommendations" class="section-horizontal">
+        <div class="section-header">
+            <h2>📚 Manga Recommendations</h2>
+            <div class="filters">
+              <select title="Filter by genre" id="manga-genre-filter"><option value="">Genre</option></select>
+              <select title="Filter by tag" id="manga-tag-filter">
+                <option value="shonen">Shonen</option>
+                <option value="seinen">Seinen</option>
+                <option value="romance">Romance</option>
+                <option value="recent">Recent Release</option>
+              </select>
+              <button id="manga-more-btn">See more recommendations</button>
+            </div>
+        </div>
+        <div id="manga-recommendations-list" class="carousel-list"></div>
+      </section>
+
+      <div class="section-columns">
+        <!-- 📰 Notícias sobre Anime -->
+        <section id="anime-news" class="section-vertical">
+            <h2>📰 Anime News</h2>
+          <div id="anime-news-list" class="news-list"></div>
+        </section>
+        <!-- 🗞️ Notícias sobre Mangá -->
+        <section id="manga-news" class="section-vertical">
+            <h2>🗞️ Manga News</h2>
+          <div id="manga-news-list" class="news-list"></div>
+        </section>
+      </div>
+
+      <!-- 📅 Próximos Lançamentos -->
+      <section id="upcoming-releases" class="section-horizontal">
+        <div class="section-header">
+            <h2>📅 Upcoming Releases</h2>
+            <div class="filters">
+              <select title="Filter by type" id="release-type-filter">
+                <option value="all">All</option>
+                <option value="anime">Anime</option>
+                <option value="manga">Manga</option>
+                <option value="movie">Movie</option>
+                <option value="ova">OVA</option>
+              </select>
+            </div>
+        </div>
+        <div id="upcoming-releases-list" class="carousel-list"></div>
       </section>
     </main>
+    <div id="details-popup" class="popup-overlay" style="display:none;">
+      <div class="popup-content">
+        <button id="close-popup" aria-label="Fechar">&times;</button>
+        <div id="popup-details-content"></div>
+      </div>
+    </div>
     <footer></footer>
     <script type="module" src="js/main.js" defer></script>
   </body>

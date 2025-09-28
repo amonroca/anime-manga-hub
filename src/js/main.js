@@ -1,105 +1,51 @@
-
-// import { getKitsuUpcomingAnime } from './api.js';
 import Menu from './Menu.mjs';
 import Footer from './Footer.mjs';
+import { getRecentAnimeRecommendations, getAnimeRecommendation, getRecentMangaRecommendations, getMangaRecommendation, getAnimeNews, getMangaNews, getSchedules } from './api';
+import { renderNewsList, renderRecommendations, renderSchedules, getRandomFavoriteMalId } from './utils'; 
 
 const menu = new Menu('home');
 const footer = new Footer();
+const animeResultsList = document.getElementById('anime-recommendations-list');
+const mangaResultsList = document.getElementById('manga-recommendations-list');
+const animeNewsList = document.getElementById('anime-news-list');
+const mangaNewsList = document.getElementById('manga-news-list');
+const schedulesList = document.getElementById('upcoming-releases-list');
+const popup = document.getElementById('details-popup');
+const closePopupBtn = document.getElementById('close-popup');
 menu.init();
 footer.init();
 
-// TODO: Refactor calendar and recommendations to separate module
-// TODO: Redesign the homepage
+window.addEventListener('DOMContentLoaded', async () => {
+  const anime_mal_id = getRandomFavoriteMalId('Anime');
+  const manga_mal_id = getRandomFavoriteMalId('Manga');
+  let animeRecommendations = {};
+  let mangaRecommendations = {};
 
-/*const calendarList = document.getElementById('calendar-list');
-const recommendationsList = document.getElementById('recommendations-list');
-
-function getWeekday(dateStr) {
-  if (!dateStr) return null;
-  const d = new Date(dateStr);
-  return d.getDay();
-}
-
-async function renderCalendar() {
-  if (!calendarList) return;
-  calendarList.classList.add('loading');
-  calendarList.innerHTML = 'Carregando lançamentos...';
-  const animes = await getKitsuUpcomingAnime(20);
-  if (!animes.length) {
-    calendarList.innerHTML = '<p>Nenhum lançamento encontrado.</p>';
-    return;
+  if (anime_mal_id) {
+    animeRecommendations = await getAnimeRecommendation(anime_mal_id);
+  } else {
+    animeRecommendations = await getRecentAnimeRecommendations();
   }
 
-  const sorted = animes
-    .filter(a => a.attributes.startDate)
-    .sort((a, b) => new Date(a.attributes.startDate) - new Date(b.attributes.startDate))
-    .slice(0, 5);
-  calendarList.classList.remove('loading');
-  calendarList.innerHTML = `
-    <div class="calendar-list" style="width:100%;justify-content:center;">
-      ${sorted.map(a => `
-        <div class="calendar-day-col">
-          <div class="calendar-day-header">${a.attributes.startDate ? new Date(a.attributes.startDate).toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }) : '-'}</div>
-          <div class="calendar-anime-card">
-            <img src="${a.attributes.posterImage?.tiny || ''}" alt="${a.attributes.canonicalTitle}" />
-            <div class="calendar-anime-title">${a.attributes.canonicalTitle}</div>
-            <div class="calendar-anime-date">${a.attributes.startDate || '-'}</div>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  `;
-}
-
-async function renderRecommendations() {
-  if (!recommendationsList) return;
-  recommendationsList.classList.add('loading');
-  recommendationsList.innerHTML = 'Carregando recomendações...';
-  const favs = JSON.parse(localStorage.getItem('favorites') || '[]');
-  if (!favs.length) {
-    recommendationsList.innerHTML = '<p>Adicione animes aos favoritos para receber recomendações!</p>';
-    return;
+  if (manga_mal_id) {
+    mangaRecommendations = await getMangaRecommendation(manga_mal_id);
+  } else {
+    mangaRecommendations = await getRecentMangaRecommendations();
   }
 
-  const genres = [];
-  favs.forEach(fav => {
-    if (fav.genres && Array.isArray(fav.genres)) {
-      genres.push(...fav.genres);
-    }
-  });
+  const animeNews = await getAnimeNews(anime_mal_id);
+  const mangaNews = await getMangaNews(manga_mal_id);
+  const schedules = await getSchedules();
+  renderRecommendations(animeRecommendations, animeResultsList);
+  renderRecommendations(mangaRecommendations, mangaResultsList);
+  renderNewsList(animeNews, animeNewsList);
+  renderNewsList(mangaNews, mangaNewsList);
+  renderSchedules(schedules, schedulesList);
+});
 
-  let url = 'https://kitsu.io/api/edge/anime?sort=-popularityRank&page[limit]=10';
-  if (genres.length) {
-    const genre = encodeURIComponent(genres[0]);
-    url = `https://kitsu.io/api/edge/anime?filter[genres]=${genre}&sort=-popularityRank&page[limit]=10`;
-  }
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    const animes = data.data || [];
-    if (!animes.length) {
-      recommendationsList.innerHTML = '<p>Nenhuma recomendação encontrada.</p>';
-      return;
-    }
-    recommendationsList.classList.remove('loading');
-    recommendationsList.innerHTML = animes.map(a => `
-      <div class="recommendation-card">
-        <img src="${a.attributes.posterImage?.tiny || ''}" alt="${a.attributes.canonicalTitle}" />
-        <div class="recommendation-info">
-          <strong>${a.attributes.canonicalTitle}</strong>
-        </div>
-      </div>
-    `).join('');
-  } catch {
-    recommendationsList.innerHTML = '<p>Erro ao buscar recomendações.</p>';
-  }
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-  renderCalendar();
-  renderRecommendations();
-});*/
-
-
-
-
+closePopupBtn.addEventListener('click', () => {
+  popup.style.display = 'none';
+});
+popup.addEventListener('click', (e) => {
+  if (e.target === popup) popup.style.display = 'none';
+});

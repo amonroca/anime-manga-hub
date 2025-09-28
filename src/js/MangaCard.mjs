@@ -12,7 +12,7 @@ function mangaCardTemplate(item) {
     <div class="card-title">${item.title}</div>
     <div class="card-info">
       <div class="card-meta">
-        <img src="${item.images?.jpg?.image_url || ''}" alt="Capa" class="cover-img" />
+        <img src="${item.images?.jpg?.image_url || ''}" alt="Cover" class="cover-img" />
         <span>${chapters}</span>
         <span>${volumes}</span>
         <span>${score}</span>
@@ -23,7 +23,7 @@ function mangaCardTemplate(item) {
       </div>
       <div class="card-actions">
         <button class="show-details">Details</button>
-        <button class="favorite-btn" data-fav="${fav ? '1' : '0'}">${fav ? '★ Favorito' : '☆ Favoritar'}</button>
+        <button class="favorite-btn" data-fav="${fav ? '1' : '0'}">${fav ? '★ Favorite' : '☆ Favorite'}</button>
       </div>
     </div>
   `;
@@ -47,11 +47,11 @@ export default class MangaCard {
       const isFav = isFavorite(this.item.mal_id);
       if (isFav) {
         removeFavorite(this.item.mal_id);
-        favBtn.textContent = '☆ Favoritar';
+        favBtn.textContent = '☆ Favorite';
         favBtn.setAttribute('data-fav', '0');
       } else {
         addFavorite(this.item);
-        favBtn.textContent = '★ Favorito';
+        favBtn.textContent = '★ Favorite';
         favBtn.setAttribute('data-fav', '1');
       }
     });
