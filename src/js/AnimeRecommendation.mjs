@@ -1,5 +1,4 @@
-import { isFavorite, addFavorite, removeFavorite } from "./utils.js";
-import AnimeCard from "./AnimeCard.mjs";
+import { isFavorite } from "./utils.js";
 
 function animeRecommendationTemplate(anime) {
   const title = anime.entry.title || anime.entry[1]?.title || 'No title';
@@ -7,12 +6,13 @@ function animeRecommendationTemplate(anime) {
   const score = anime.entry.score ? `★ ${anime.entry.score}` : '★9.5';
   const type = anime.entry.type || 'Comic';
   const year = anime.entry.year || '2025';
+  const fav = isFavorite(anime.entry.mal_id || anime.entry[1]?.mal_id);
   return `
     <div class="card-image">
       <img src="${imageUrl}" alt="${title}" />
       <div class="card-actions">
-        <button id="details-btn" class="action-btn" title="Details">🔍</button>
-        <button id="favorite-btn" class="action-btn" title="Favorite">☆</button>
+        <button id="details-anime-btn" class="action-btn" title="Details">🔍</button>
+        <button id="favorite-anime-btn" class="action-btn" title="Favorite" data-fav="${fav ? '1' : '0'}">${fav ? '★' : '☆'}</button>
       </div>
       <div class="card-badges">
         ${score ? `<span class='badge'>${score}</span>` : ''}

@@ -1,5 +1,4 @@
-import { getCharacters, getDetails } from "./api";
-import { isFavorite, addFavorite, removeFavorite } from "./utils.js";
+import { isFavorite } from "./utils.js";
 
 function mangaCardTemplate(item) {
   const chapters = item.chapters ? `Chapters: ${item.chapters}` : '';
@@ -37,61 +36,5 @@ export default class MangaCard {
 
   render() {
     return mangaCardTemplate(this.item);
-  }
-
-  bindFavoriteButton(cardElem) {
-    const favBtn = cardElem.querySelector('.favorite-btn');
-    if (!favBtn) return;
-    favBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const isFav = isFavorite(this.item.mal_id);
-      if (isFav) {
-        removeFavorite(this.item.mal_id);
-        favBtn.textContent = '☆ Favorite';
-        favBtn.setAttribute('data-fav', '0');
-      } else {
-        addFavorite(this.item);
-        favBtn.textContent = '★ Favorite';
-        favBtn.setAttribute('data-fav', '1');
-      }
-    });
-  }
-
-  async showDetails() {
-    const popup = document.getElementById('details-popup');
-    const popupContent = document.getElementById('popup-details-content');
-    popup.style.display = 'flex';
-    popupContent.innerHTML = '<p>Loading details...</p>';
-
-    let details = {};
-    let characters = [];
-
-    try {
-      details = await getDetails(this.type, this.item.mal_id);
-      const allCharacters = await getCharacters(this.type, this.item.mal_id);
-      const mains = allCharacters.filter(c => c.role && c.role.toLowerCase() === 'main');
-      const supports = allCharacters.filter(c => c.role && c.role.toLowerCase() === 'supporting');
-      characters = mains.slice(0, 8);
-      if (characters.length < 8) {
-        characters = characters.concat(supports.slice(0, 8 - characters.length));
-      }
-    } catch {
-      popupContent.innerHTML = '<p>Failed to load details.</p>';
-      return;
-    }
-
-    popupContent.innerHTML = `
-      <h3>${details.title}</h3>
-      <p><strong>Synopsis:</strong> ${details.synopsis || 'No synopsis.'}</p>
-      <h4>Characters</h4>
-      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
-        ${characters.map(c => `
-          <div style="text-align:center;max-width:80px;">
-            <img src="${c.character?.images?.jpg?.image_url || ''}" alt="${c.character?.name}" class="character-img" />
-            <div style="font-size:0.9em;">${c.character?.name}</div>
-          </div>
-        `).join('')}
-      </div>
-    `;
   }
 }
