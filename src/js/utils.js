@@ -5,7 +5,7 @@ import MangaNews from './MangaNews.mjs';
 import AnimeRecommendation from './AnimeRecommendation.mjs';
 import MangaRecommendation from './MangaRecommendation.mjs';
 import Schedules from './Schedules.mjs';
-import { getCharacters, getDetails, getAnimeStreamingLinks } from "./api";
+import { getCharacters, getDetails, getAnimeStreamingLinks, getRecentAnimeRecommendations, getAnimeRecommendation, getRecentMangaRecommendations, getMangaRecommendation, getAnimeGenres, getMangaGenres } from "./api";
 
 export function getFavorites() {
     return JSON.parse(localStorage.getItem('favorites') || '[]');
@@ -23,14 +23,14 @@ export function addFavorite(item) {
     if (typeof item.mal_id === 'number') {
         mal_id = item.mal_id;
     } else {
-        mal_id = item.entry.mal_id || item.entry[1]?.mal_id;
+        mal_id = item.entry.mal_id;
     }
 
     if (!favs.find(f => f.id === mal_id)) {
         favs.push({
             id: mal_id,
-            title: item.title || item.entry.title || item.entry[1]?.title || 'No title',
-            image: item.images?.webp?.image_url || item.entry.images?.webp?.image_url || item.entry[1]?.images?.webp?.image_url || 'No Image',
+            title: item.title || item.entry.title || 'No title',
+            image: item.images?.webp?.image_url || item.entry.images?.webp?.image_url || 'No Image',
             type: item.type === 'Manga' ? item.type : 'Anime',
         });
         localStorage.setItem('favorites', JSON.stringify(favs));
@@ -117,32 +117,30 @@ export function addToWatchlist(item) {
 }
 
 export function renderRecommendations(recommendations, htmlElement) {
+    const type = htmlElement.id?.includes('anime') ? 'anime' : 'manga';
     htmlElement.innerHTML = '';
     if (!recommendations.length) {
         htmlElement.innerHTML = '<p>No recommendations found.</p>';
         return;
     }
 
-    const seen = new Set();
-    const uniqueRecommendations = recommendations.filter(item => {
-        const mal_id = item.entry?.mal_id || item.entry?.[1]?.mal_id || item.mal_id;
-        if (seen.has(mal_id)) return false;
-        seen.add(mal_id);
-        return true;
-    });
+    const limitedRecommendations = recommendations.slice(0, sessionStorage.getItem(`${type}RcPage`) ? Number(sessionStorage.getItem(`${type}RcPage`)) : 20);
 
-    uniqueRecommendations.slice(0, 20).forEach(item => {
-        const rec = htmlElement.id?.includes('anime') ? new AnimeRecommendation(item) : new MangaRecommendation(item);
+    throttleRecommendations(limitedRecommendations, async item => {
+        const rec = type === 'anime' ? new AnimeRecommendation(item) : new MangaRecommendation(item);
         const div = document.createElement('div');
         div.className = 'carousel-item';
         div.innerHTML = rec.render();
         div.style.opacity = '0';
-        div.querySelector(htmlElement.id.includes('anime') ? '#details-anime-btn' : '#details-manga-btn')?.addEventListener('click', () => showDetails(
-            item.entry?.mal_id || item.entry?.[1]?.mal_id || item.mal_id, htmlElement.id.includes('anime') ? 'anime' : 'manga'));
-        item.type = htmlElement.id?.includes('anime') ? 'Anime' : 'Manga';
-        bindFavoriteButton(div.querySelector(htmlElement.id.includes('anime') ? '#favorite-anime-btn' : '#favorite-manga-btn'), item);
+        div.querySelector(type === 'anime' ? '#details-anime-btn' : '#details-manga-btn')?.addEventListener('click', () => showDetails(item.entry?.mal_id, type));
+        item.type = type === 'anime' ? 'Anime' : 'Manga';
+        bindFavoriteButton(div.querySelector(type === 'anime' ? '#favorite-anime-btn' : '#favorite-manga-btn'), item);
         setTimeout(() => { div.style.opacity = '1'; }, 100);
         htmlElement.appendChild(div);
+        await getDetailsLazy(type, item.entry?.mal_id).then(details => {
+            const badgesContainer = rec.renderBadges(details);
+            div.appendChild(badgesContainer);
+        });
     });
 }
 
@@ -176,6 +174,62 @@ export function renderSchedules(schedules, htmlElement) {
   });
 }
 
+export async function getRecommendations(type) {
+    const favoriteMalId = getRandomFavoriteMalId(type.charAt(0).toUpperCase() + type.slice(1));
+    let recommendations = null;
+    if (favoriteMalId) {
+        recommendations = type == 'anime' ? await getAnimeRecommendation(favoriteMalId) : await getMangaRecommendation(favoriteMalId);
+        sessionStorage.setItem(`${type}Recommendations`, JSON.stringify(recommendations));
+        return Promise.resolve(recommendations);
+    } else {
+        recommendations = type == 'anime' ? await getRecentAnimeRecommendations() : await getRecentMangaRecommendations();
+
+        const formattedRecs = recommendations.map(item => (
+            {
+                entry: item.entry[0],
+            },
+            { 
+                entry: item.entry[1],
+            }
+        ));
+
+        const seen = new Set();
+        const uniqueRecs = formattedRecs.filter(item => {
+            const id = item.entry?.mal_id;
+            if (!id || seen.has(id)) return false;
+            seen.add(id);
+            return true;
+        });
+
+        sessionStorage.setItem(`${type}Recommendations`, JSON.stringify(uniqueRecs));
+        return Promise.resolve(uniqueRecs);
+    }
+}
+
+export function getCacheByType(type) {
+    const chached = [];
+    for (const key in sessionStorage) {
+        if (key.startsWith(type) && key.includes('_')) {
+            const item = sessionStorage.getItem(key);
+            if (item) {
+                chached.push(JSON.parse(item));
+            }
+        }
+    }
+    return chached;
+}
+
+export async function fillGenresFilter(type, selectElement) {
+    const genresList = type === 'anime' ? await getAnimeGenres() : await getMangaGenres();
+    selectElement.innerHTML = '<option value="all">All Genres</option>';
+    genresList.forEach(genre => {
+        const option = document.createElement('option');
+        option.value = genre.mal_id;
+        option.textContent = genre.name;
+        selectElement.appendChild(option);
+    });
+}
+
 async function showDetails(mal_id, type) {
     const popup = document.getElementById('details-popup');
     const popupContent = document.getElementById('popup-details-content');
@@ -187,7 +241,7 @@ async function showDetails(mal_id, type) {
     let streamingList = [];
 
     try {
-        details = await getDetails(type, mal_id);
+        details = await getDetailsLazy(type, mal_id);
 
         const allCharacters = await getCharacters(type, mal_id);
         const mains = allCharacters.filter(c => c.role && c.role.toLowerCase() === 'main');
@@ -260,4 +314,28 @@ function bindFavoriteButton(htmlElement, item) {
             htmlElement.setAttribute('data-fav', '1');
         }
     });
+}
+
+async function getDetailsLazy(type, mal_id) {
+    const cacheKey = `${type}_${mal_id}`;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+        return Promise.resolve(JSON.parse(cached));
+    } else {
+        return await getDetails(type, mal_id).then(data => {
+            sessionStorage.setItem(cacheKey, JSON.stringify(data));
+            return data;
+        });
+    }
+}
+
+function throttleRecommendations(recommendations, fn, delay = 1200) {
+  let i = 0;
+  function next() {
+    if (i >= recommendations.length) return;
+    fn(recommendations[i]);
+    i++;
+    setTimeout(next, delay);
+  }
+  next();
 }

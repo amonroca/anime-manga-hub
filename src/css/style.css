@@ -149,13 +149,14 @@
 }
 #close-popup {
   position: absolute;
-  top: 10px;
+  top: 0;
   right: 10px;
-  background: none;
+  background: transparent;
   border: none;
   font-size: 2rem;
   color: #fff;
   cursor: pointer;
+  padding: 0;
 }
 
 .result-card {
@@ -588,7 +589,4 @@ button:focus-visible {
   a:hover {
     color: #747bff;
   }
-  /*button {
-    background-color: #f9f9f9;
-  } */
 }

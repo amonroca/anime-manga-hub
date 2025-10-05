@@ -1,12 +1,9 @@
 import { isFavorite } from "./utils.js";
 
 function mangaRecommendationTemplate(manga) {
-  const title = manga.entry.title || manga.entry[1]?.title || 'No title';
-  const imageUrl = manga.entry.images?.webp?.image_url || manga.entry[1]?.images?.webp?.image_url || '';
-  const score = manga.entry.score ? `★ ${manga.entry.score}` : '★9.5';
-  const type = manga.entry.type || 'Comic';
-  const year = manga.entry.year || '2025';
-  const fav = isFavorite(manga.entry.mal_id || manga.entry[1]?.mal_id);
+  const title = manga.entry.title || 'No title';
+  const imageUrl = manga.entry.images?.webp?.image_url || '';
+  const fav = isFavorite(manga.entry.mal_id);
 
   return `
     <div class="card-image">
@@ -14,11 +11,6 @@ function mangaRecommendationTemplate(manga) {
       <div class="card-actions">
         <button id="details-manga-btn" class="action-btn" title="Details">🔍</button>
         <button id="favorite-manga-btn" class="action-btn" title="Favorite">${fav ? '★' : '☆'}</button>
-      </div>
-      <div class="card-badges">
-        ${score ? `<span class='badge'>${score}</span>` : ''}
-        ${type ? `<span class='badge'>${type}</span>` : ''}
-        ${year ? `<span class='badge'>${year}</span>` : ''}
       </div>
     </div>
     <h3 class="card-title">${title}</h3>
@@ -32,5 +24,33 @@ export default class MangaRecommendation {
 
   render() {
     return mangaRecommendationTemplate(this.manga);
+  }
+
+  renderBadges(details) {
+    const container = document.createElement('div');
+    container.className = 'card-badges';
+
+    if (details.score) {
+      const scoreBadge = document.createElement('span');
+      scoreBadge.className = 'badge';
+      scoreBadge.textContent = `★${details.score.toFixed(1)}`;
+      container.appendChild(scoreBadge);
+    }
+
+    if (details.genres && details.genres.length > 0) {
+      const genreBadge = document.createElement('span');
+      genreBadge.className = 'badge';
+      genreBadge.textContent = details.genres[0].name;
+      container.appendChild(genreBadge);
+    }
+
+    if (details.published?.from) {
+      const yearBadge = document.createElement('span');
+      yearBadge.className = 'badge';
+      yearBadge.textContent = details.published?.prop?.from?.year;
+      container.appendChild(yearBadge);
+    }
+
+    return container;
   }
 }

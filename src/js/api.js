@@ -8,18 +8,6 @@ export async function getKitsuUpcomingAnime(limit = 20) {
   }
 }
 
-/*export async function getKitsuAnimeByIds(ids = []) {
-  if (!ids.length) return [];
-  try {
-    const filter = ids.map(id => `filter[id]=${id}`).join('&');
-    const res = await fetch(`https://kitsu.io/api/edge/anime?${filter}`);
-    const data = await res.json();
-    return data.data || [];
-  } catch {
-    return [];
-  }
-}*/
-
 export async function searchJikan(query, type) {
   try {
     const res = await fetch(`https://api.jikan.moe/v4/${type}?q=${encodeURIComponent(query)}`);
@@ -157,5 +145,25 @@ export async function getMangaById(mal_id) {
     return data.data || null;
   } catch {
     return null;
+  }
+}
+
+export async function getAnimeGenres() {
+  try {
+    const res = await fetch(`https://api.jikan.moe/v4/genres/anime?filter=genres`);
+    const data = await res.json();
+    return data.data || [];
+  } catch {
+    return [];
+  }
+}
+
+export async function getMangaGenres() {
+  try {
+    const res = await fetch(`https://api.jikan.moe/v4/genres/manga?filter=genres`);
+    const data = await res.json();
+    return data.data || [];
+  } catch {
+    return [];
   }
 }
