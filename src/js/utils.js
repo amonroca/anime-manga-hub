@@ -2,10 +2,12 @@ import AnimeCard from './AnimeCard.mjs';
 import MangaCard from './MangaCard.mjs';
 import AnimeNews from './AnimeNews.mjs';
 import MangaNews from './MangaNews.mjs'; 
+import Releases from './Releases.mjs';
 import AnimeRecommendation from './AnimeRecommendation.mjs';
 import MangaRecommendation from './MangaRecommendation.mjs';
-import Schedules from './Schedules.mjs';
-import { getCharacters, getDetails, getAnimeStreamingLinks, getRecentAnimeRecommendations, getAnimeRecommendation, getRecentMangaRecommendations, getMangaRecommendation, getAnimeGenres, getMangaGenres } from "./api";
+import { getCharacters, getDetails, getAnimeStreamingLinks, getRecentAnimeRecommendations, getAnimeRecommendation, 
+    getRecentMangaRecommendations, getMangaRecommendation, getAnimeGenres, getMangaGenres, getAnimeNews, getMangaNews,
+    getSeasonUpcoming } from "./api";
 
 export function getFavorites() {
     return JSON.parse(localStorage.getItem('favorites') || '[]');
@@ -104,16 +106,16 @@ export function convertToJson(res) {
 }
 
 export function addToWatchlist(item) {
-  let list = JSON.parse(localStorage.getItem('watchlist') || '[]');
-  if (!list.find(i => i.id === String(item.mal_id))) {
-    list.push({
-      id: String(item.mal_id),
-      title: item.title,
-      image: item.images?.jpg?.image_url || '',
-    });
-    localStorage.setItem('watchlist', JSON.stringify(list));
-    alert('Added to the watchlist!');
-  }
+    let list = JSON.parse(localStorage.getItem('watchlist') || '[]');
+    if (!list.find(i => i.id === String(item.mal_id))) {
+        list.push({
+        id: String(item.mal_id),
+        title: item.title,
+        image: item.images?.jpg?.image_url || '',
+        });
+        localStorage.setItem('watchlist', JSON.stringify(list));
+        alert('Added to the watchlist!');
+    }
 }
 
 export function renderRecommendations(recommendations, htmlElement) {
@@ -144,12 +146,22 @@ export function renderRecommendations(recommendations, htmlElement) {
     });
 }
 
-export function renderNewsList(newsList, htmlElement) {
+export async function renderNewsList(type, htmlElement) {
     htmlElement.innerHTML = '';
+    const mal_id = getRandomFavoriteMalId(type.charAt(0).toUpperCase() + type.slice(1));
+
+    if (!mal_id) {
+        htmlElement.innerHTML = '<p>No favorite found to fetch news.</p>';
+        return;
+    }
+
+    const newsList = type === 'anime' ? await getAnimeNews(mal_id) : await getMangaNews(mal_id);
+
     if (!newsList.length) {
         htmlElement.innerHTML = '<p>No news found.</p>';
         return;
     }
+
     newsList.slice(0, 4).forEach(item => {
         const news = htmlElement.id?.includes('anime') ? new AnimeNews(item) : new MangaNews(item);
         const div = document.createElement('div');
@@ -159,19 +171,61 @@ export function renderNewsList(newsList, htmlElement) {
     });
 }
 
-export function renderSchedules(schedules, htmlElement) {
-  htmlElement.innerHTML = '';
-  if (!schedules.length) {
-    htmlElement.innerHTML = '<p>No schedules found.</p>';
-    return;
-  }
-  schedules.forEach(item => {
-    const schedule = new Schedules(item);
-    const div = document.createElement('div');
-    div.className = 'schedule-card';
-    div.innerHTML = schedule.render();
-    htmlElement.appendChild(div);
-  });
+export async function renderUpcomingReleases(htmlElement) {
+    htmlElement.innerHTML = '';
+    let releases = [];
+    let validCards = [];
+    let keepFetching = true;
+    let page = 1;
+
+    while (validCards.length < 25 && keepFetching) {
+        releases = await getSeasonUpcoming(page);
+        if (!releases || !releases.length) break;
+        const filtered = releases.filter(item => item.aired?.from);
+        validCards = validCards.concat(filtered);
+        page++;
+        keepFetching = releases.length > 0;
+    }
+
+    if (!validCards.length) {
+        htmlElement.innerHTML = '<p>No upcoming releases found.</p>';
+        return;
+    }
+        
+
+
+    const seen = new Set();
+    validCards = validCards.filter(item => {
+        const id = item.mal_id;
+        console.log(id);
+        if (!id || seen.has(id)) return false;
+        seen.add(id);
+        return true;
+    });
+
+    if (!validCards.length) {
+        htmlElement.innerHTML = '<p>No upcoming releases with release date found.</p>';
+        return;
+    }
+
+    validCards.sort((a, b) => {
+        const aDate = a.aired?.from;
+        const bDate = b.aired?.from;
+        if (!aDate && !bDate) return 0;
+        if (!aDate) return 1;
+        if (!bDate) return -1;
+        const aObj = typeof aDate === 'string' ? new Date(aDate) : new Date(aDate.year, (aDate.month || 1) - 1, aDate.day || 1);
+        const bObj = typeof bDate === 'string' ? new Date(bDate) : new Date(bDate.year, (bDate.month || 1) - 1, bDate.day || 1);
+        return aObj - bObj;
+    });
+
+    validCards.slice(0, 25).forEach(item => {
+        const release = new Releases(item);
+        const div = document.createElement('div');
+        div.className = 'release-card';
+        div.innerHTML = release.render();
+        htmlElement.appendChild(div);
+    });
 }
 
 export async function getRecommendations(type) {
@@ -229,6 +283,8 @@ export async function fillGenresFilter(type, selectElement) {
         selectElement.appendChild(option);
     });
 }
+
+
 
 async function showDetails(mal_id, type) {
     const popup = document.getElementById('details-popup');

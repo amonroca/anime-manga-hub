@@ -158,7 +158,9 @@
   cursor: pointer;
   padding: 0;
 }
-
+#details-popup {
+  display: none;
+}
 .result-card {
   display: flex;
   align-items: flex-start;
