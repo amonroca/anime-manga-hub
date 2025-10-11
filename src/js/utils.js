@@ -3,6 +3,7 @@ import MangaCard from './MangaCard.mjs';
 import AnimeNews from './AnimeNews.mjs';
 import MangaNews from './MangaNews.mjs'; 
 import Releases from './Releases.mjs';
+import Episodes from './Episodes.mjs';
 import AnimeRecommendation from './AnimeRecommendation.mjs';
 import MangaRecommendation from './MangaRecommendation.mjs';
 import { getCharacters, getDetails, getAnimeStreamingLinks, getRecentAnimeRecommendations, getAnimeRecommendation, 
@@ -107,14 +108,18 @@ export function convertToJson(res) {
 
 export function addToWatchlist(item) {
     let list = JSON.parse(localStorage.getItem('watchlist') || '[]');
-    if (!list.find(i => i.id === String(item.mal_id))) {
+    if (!list.find(i => i.id === String(item.episode_id))) {
         list.push({
-        id: String(item.mal_id),
-        title: item.title,
-        image: item.images?.jpg?.image_url || '',
+        id: String(item.episode_id),
+        anime_title: item.anime_title,
+        episode_title: item.title,
+        mal_id: String(item.mal_id),
+        url: item.url,
         });
         localStorage.setItem('watchlist', JSON.stringify(list));
         alert('Added to the watchlist!');
+    } else {
+        alert('Already in the watchlist!');
     }
 }
 
@@ -177,9 +182,15 @@ export async function renderUpcomingReleases(htmlElement) {
     let validCards = [];
     let keepFetching = true;
     let page = 1;
+    let lastRequestTime = 0;
 
     while (validCards.length < 25 && keepFetching) {
-        releases = await getSeasonUpcoming(page);
+        const now = Date.now();
+        if (now - lastRequestTime < 350) {
+            await new Promise(res => setTimeout(res, 350 - (now - lastRequestTime)));
+        }
+        lastRequestTime = Date.now();
+        releases = await safeGetSeasonUpcoming(page);
         if (!releases || !releases.length) break;
         const filtered = releases.filter(item => item.aired?.from);
         validCards = validCards.concat(filtered);
@@ -191,13 +202,10 @@ export async function renderUpcomingReleases(htmlElement) {
         htmlElement.innerHTML = '<p>No upcoming releases found.</p>';
         return;
     }
-        
-
 
     const seen = new Set();
     validCards = validCards.filter(item => {
         const id = item.mal_id;
-        console.log(id);
         if (!id || seen.has(id)) return false;
         seen.add(id);
         return true;
@@ -284,7 +292,16 @@ export async function fillGenresFilter(type, selectElement) {
     });
 }
 
-
+export function renderEpisodesList(episodes, htmlElement) {
+    htmlElement.innerHTML = '';
+    episodes.forEach(episode => {
+        const epObj = new Episodes(episode);
+        const li = document.createElement('li');
+        li.innerHTML = epObj.render();
+        li.querySelector('#add-watchlist-btn').addEventListener('click', () => { addToWatchlist(episode) });
+        htmlElement.appendChild(li);
+    });
+}
 
 async function showDetails(mal_id, type) {
     const popup = document.getElementById('details-popup');
@@ -320,10 +337,18 @@ async function showDetails(mal_id, type) {
 
     let trailerEmbed = '';
     let animeStreaming = '';
+    let animeEpisodes = '';
 
     if (details.trailer?.embed_url) {
         trailerEmbed = `<h4>Trailer</h4><iframe src="${details.trailer.embed_url}" frameborder="0" allowfullscreen style="width:100%;height:220px;"></iframe>`;
+    }
+
+    if (streamingList.length) {
         animeStreaming = `<h4>Watch on</h4><p>${streamingList.map(link => `<a href="${link.url}" target="_blank">${link.name}</a>`).join(' | ')}</p>`;
+    }
+
+    if (details.type !== 'Movie') {
+        animeEpisodes = `<h4>Episodes</h4><p>Total Episodes: ${details.episodes || 'N/A'} <a href="episodes.html?animeId=${details.mal_id}&animeTitle=${details.title}">(See all episodes)</a></p>`;
     }
 
     popupContent.innerHTML = `
@@ -331,6 +356,7 @@ async function showDetails(mal_id, type) {
         <p><strong>Synopsis:</strong> ${details.synopsis || 'No synopsis.'}</p>
         ${trailerEmbed}
         ${animeStreaming}
+        ${animeEpisodes}
         <h4>Characters</h4>
         <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
         ${characters.map(c => `
@@ -394,4 +420,17 @@ function throttleRecommendations(recommendations, fn, delay = 1200) {
     setTimeout(next, delay);
   }
   next();
+}
+
+async function safeGetSeasonUpcoming(page, maxRetries = 3) {
+    let attempt = 0;
+    while (attempt < maxRetries) {
+        try {
+            return await getSeasonUpcoming(page);
+        } catch (e) {
+            attempt++;
+            await new Promise(res => setTimeout(res, 1000));
+        }
+    }
+    return [];
 }

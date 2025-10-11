@@ -1,6 +1,5 @@
 import Menu from './Menu.mjs';
 import Footer from './Footer.mjs';
-//import { getSchedules } from './api';
 import { renderNewsList, renderRecommendations, renderUpcomingReleases, getRecommendations, fillGenresFilter, getCacheByType } from './utils'; 
 
 const menu = new Menu('home');
@@ -24,33 +23,47 @@ const mangaRcPage = 20;
 menu.init();
 footer.init();
 
+//sessionStorage.clear();
+
+let lastRequestTime = 0;
+let requestsThisMinute = 0;
+let minuteStart = Date.now();
+
+async function rateLimitedRequest(fn) {
+	const now = Date.now();
+
+	if (now - lastRequestTime < 350) {
+		await new Promise(res => setTimeout(res, 350 - (now - lastRequestTime)));
+	}
+	lastRequestTime = Date.now();
+
+	if (now - minuteStart > 60000) {
+		minuteStart = now;
+		requestsThisMinute = 0;
+	}
+	if (requestsThisMinute >= 60) {
+		await new Promise(res => setTimeout(res, 60000 - (now - minuteStart)));
+		minuteStart = Date.now();
+		requestsThisMinute = 0;
+	}
+	requestsThisMinute++;
+	return await fn();
+}
+
 window.addEventListener('DOMContentLoaded', async () => {
 	let animeRecommendations = {};
 	let mangaRecommendations = {};
 
-	animeRecommendations = await getRecommendations('anime');
-	mangaRecommendations = await getRecommendations('manga');
-
+	animeRecommendations = await rateLimitedRequest(() => getRecommendations('anime'));
+	mangaRecommendations = await rateLimitedRequest(() => getRecommendations('manga'));
 	renderRecommendations(animeRecommendations, animeResultsList);
 	renderRecommendations(mangaRecommendations, mangaResultsList);
 
-	await fillGenresFilter('anime', animeGenreFilter);
-	sessionStorage.removeItem('filteredAnime');
-
-	await fillGenresFilter('manga', mangaGenreFilter);
-	sessionStorage.removeItem('filteredManga');
-
-	setTimeout(async () => {
-		await renderNewsList('anime', animeNewsList);
-	}, 1500);
-
-	setTimeout(async () => {
-		await renderNewsList('manga', mangaNewsList);
-	}, 1500);
-
-	setTimeout(async () => {
-		await renderUpcomingReleases(upcomingReleasesList);
-	}, 1500);
+	await rateLimitedRequest(() => fillGenresFilter('anime', animeGenreFilter));
+	await rateLimitedRequest(() => fillGenresFilter('manga', mangaGenreFilter));
+	await rateLimitedRequest(() => renderNewsList('anime', animeNewsList));
+	await rateLimitedRequest(() => renderNewsList('manga', mangaNewsList));
+	await rateLimitedRequest(() => renderUpcomingReleases(upcomingReleasesList));
 
 });
 

@@ -10,9 +10,9 @@ function releasesTemplate(anime) {
       </div>
       <div class="upcoming-type">${anime.type || ''} ${anime.status ? '• ' + anime.status : ''}</div>
       <div class="upcoming-rating">${anime.rating || 'N/A'}</div>
-      <div class="upcoming-trailer">
+      <!--<div class="upcoming-trailer">
         ${anime.trailer?.embed_url ? `<iframe src="${anime.trailer.embed_url}" frameborder="0" allowfullscreen></iframe>` : 'No trailer available.'}
-      </div>
+      </div>-->
     </div>
   `;
 }

@@ -16,5 +16,11 @@
         "Name": "watchlist",
         "Label": "Watchlist",
         "Href": "watchlist.html"
+    },
+    {
+        "Id": 4,
+        "Name": "favorites",
+        "Label": "Favorites",
+        "Href": "favorites.html"
     }
 ]

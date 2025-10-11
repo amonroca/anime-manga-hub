@@ -592,3 +592,92 @@ button:focus-visible {
     color: #747bff;
   }
 }
+
+.favorites-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+  overflow-y: auto;
+  max-height: 70vh;
+  text-align: center;
+}
+
+/* Episódios - estilos para episodeTemplate */
+.episode-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: #3a3d44;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(100, 108, 255, 0.08);
+  text-align: center;
+}
+.episode-number {
+  font-weight: bold;
+  color: #646cff;
+  font-size: 1.1rem;
+}
+.episode-title {
+  font-size: 1.08rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
+.episode-aired {
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-right: 1rem;
+}
+.episode-filler {
+  font-size: 0.9rem;
+  color: #ff6a00;
+  font-style: italic;
+}
+.episode-recap {
+  font-size: 0.9rem;
+  color: #2563eb;
+  font-style: italic;
+}
+.episode-link {
+  color: #646cff;
+  text-decoration: underline;
+  font-size: 0.98rem;
+  margin-top: 0.3rem;
+}
+.add-watchlist-btn {
+  margin-top: 0.5rem;
+  padding: 0.4rem 1rem;
+  background: #646cff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.98rem;
+  transition: background 0.2s;
+}
+.add-watchlist-btn:hover {
+  background: #4f46e5;
+}
+
+#episodes-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.episode-item:hover {
+  background: #4a4d54;
+}
+
+#anime-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-align: center;
+}

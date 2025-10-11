@@ -1,5 +1,6 @@
 import Menu from "./Menu.mjs";
 import Footer from "./Footer.mjs";
+import Watchlist from "./Watchlist.mjs";
 
 const menu = new Menu('watchlist');
 const footer = new Footer();
@@ -11,22 +12,10 @@ function getWatchlist() {
 }
 
 function renderWatchlistPage() {
-  const list = getWatchlist();
   const ul = document.getElementById('watchlist-page-list');
   ul.innerHTML = '';
-  if (list.length === 0) {
-    ul.innerHTML = '<li>Nenhum item salvo.</li>';
-    return;
-  }
-  list.forEach(item => {
-    const li = document.createElement('li');
-    li.innerHTML = `
-      <img src="${item.image}" alt="Capa" class="cover-img" />
-      <span>${item.title}</span>
-      <button data-id="${item.id}" class="remove-watchlist">Remover</button>
-    `;
-    ul.appendChild(li);
-  });
+  const watchlist = new Watchlist();
+  ul.innerHTML = watchlist.render();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
