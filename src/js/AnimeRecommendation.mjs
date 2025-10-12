@@ -1,5 +1,11 @@
+// Compact card used in the recommendations carousel for Anime entries.
+// Renders a small image card with action buttons and dynamic badges.
 import { isFavorite } from "./utils.js";
 
+/**
+ * Builds the HTML snippet for an anime recommendation card.
+ * - Expects `anime.entry` shape from Jikan recommendations endpoint.
+ */
 function animeRecommendationTemplate(anime) {
   const title = anime.entry.title || 'No title';
   const imageUrl = anime.entry.images?.webp?.image_url || '';
@@ -18,14 +24,28 @@ function animeRecommendationTemplate(anime) {
 }
 
 export default class AnimeRecommendation {
+  /**
+   * @param {object} anime - Recommendation object containing `entry`
+   */
   constructor(anime) {
     this.anime = anime;
   }
 
+  /**
+   * Returns the base HTML (image + buttons + title).
+   */
   render() {
     return animeRecommendationTemplate(this.anime);
   }
 
+  /**
+   * Builds dynamic badges based on full details fetched lazily:
+   * - score (★x.x)
+   * - first genre name
+   * - aired year
+   * @param {object} details - object from Jikan full details endpoint
+   * @returns {HTMLDivElement} DOM node with badges
+   */
   renderBadges(details) {
     const container = document.createElement('div');
     container.className = 'card-badges';

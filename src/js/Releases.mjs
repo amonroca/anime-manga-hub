@@ -1,3 +1,5 @@
+// Card for upcoming releases (season upcoming list).
+// Displays image, date, title, type/status, and rating; trailer embed is intentionally commented out.
 function releasesTemplate(anime) {
   return `
     <div class="upcoming-card">
@@ -17,6 +19,7 @@ function releasesTemplate(anime) {
   `;
 }
 
+// Formats an ISO-like date string into a short en-US date label.
 function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
@@ -25,10 +28,16 @@ function formatDate(dateStr) {
 }
 
 export default class Releases {
+    /**
+     * @param {object} anime - Upcoming anime object from Jikan
+     */
     constructor(anime) {
         this.anime = anime;
     }
 
+    /**
+     * @returns {string} HTML string of the release card
+     */
     render() {
         return releasesTemplate(this.anime);
     }

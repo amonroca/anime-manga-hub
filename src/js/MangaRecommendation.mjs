@@ -1,5 +1,11 @@
+// Compact card used in the recommendations carousel for Manga entries.
+// Very similar to AnimeRecommendation, but reads `published` instead of `aired` for year.
 import { isFavorite } from "./utils.js";
 
+/**
+ * Builds the HTML snippet for a manga recommendation card.
+ * - Expects `manga.entry` shape from Jikan recommendations endpoint.
+ */
 function mangaRecommendationTemplate(manga) {
   const title = manga.entry.title || 'No title';
   const imageUrl = manga.entry.images?.webp?.image_url || '';
@@ -18,14 +24,28 @@ function mangaRecommendationTemplate(manga) {
 }
 
 export default class MangaRecommendation {
+  /**
+   * @param {object} manga - Recommendation object containing `entry`
+   */
   constructor(manga) {
     this.manga = manga;
   }
 
+  /**
+   * Returns the base HTML (image + buttons + title).
+   */
   render() {
     return mangaRecommendationTemplate(this.manga);
   }
 
+  /**
+   * Builds dynamic badges based on full details fetched lazily:
+   * - score (★x.x)
+   * - first genre name
+   * - published year
+   * @param {object} details - object from Jikan full details endpoint (manga)
+   * @returns {HTMLDivElement} DOM node with badges
+   */
   renderBadges(details) {
     const container = document.createElement('div');
     container.className = 'card-badges';

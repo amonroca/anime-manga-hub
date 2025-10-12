@@ -1,3 +1,16 @@
+/**
+ * Render a single watchlist entry as an <li> element.
+ *
+ * Expected item shape:
+ * - id: string (unique id composed of animeId + '_' + episodeMalId)
+ * - anime_title: string
+ * - mal_id: number (episode MAL id)
+ * - episode_title: string
+ * - url: string (link to episode/source)
+ *
+ * @param {Object} item
+ * @returns {string} HTML string
+ */
 function watchlistTemplate(item) {
   return `
     <li>
@@ -10,16 +23,24 @@ function watchlistTemplate(item) {
   `;
 }
 
+/**
+ * Watchlist component: loads items from localStorage and renders them as a list.
+ */
 export default class Watchlist {
-    constructor() {
-        this.list = JSON.parse(localStorage.getItem('watchlist') || '[]');
-    }
+  constructor() {
+    /** @type {Array<Object>} */
+    this.list = JSON.parse(localStorage.getItem('watchlist') || '[]');
+  }
 
-    render() {
-        if (this.list.length === 0) {
-            return '<li>No items saved.</li>';
-        } else {
-            return this.list.map(item => watchlistTemplate(item)).join('');
-        }
+  /**
+   * Render the full list or an empty-state message when no items exist.
+   * @returns {string}
+   */
+  render() {
+    if (this.list.length === 0) {
+      return '<li>No items saved.</li>';
+    } else {
+      return this.list.map(item => watchlistTemplate(item)).join('');
     }
+  }
 }
