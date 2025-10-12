@@ -23,6 +23,30 @@ export default class Menu {
     const navHtml = this.renderMenu(navItems, this.active);
     const header = document.querySelector('header');
     header.insertAdjacentHTML('afterbegin', navHtml);
+
+    // Wire up mobile hamburger toggle
+    const toggleBtn = header.querySelector('.menu-toggle');
+    const links = header.querySelectorAll('.main-menu .menu-link');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => {
+        const isOpen = document.body.classList.toggle('nav-open');
+        toggleBtn.setAttribute('aria-expanded', String(isOpen));
+      });
+    }
+    // Close menu on link click (mobile convenience)
+    links.forEach((a) => a.addEventListener('click', () => {
+      if (document.body.classList.contains('nav-open')) {
+        document.body.classList.remove('nav-open');
+        if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+      }
+    }));
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.body.classList.contains('nav-open')) {
+        document.body.classList.remove('nav-open');
+        if (toggleBtn) toggleBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
   }
 
   /**
@@ -54,7 +78,14 @@ export default class Menu {
  */
 function menuTemplate(navItems, active) {
   return `
-    <nav class="main-menu">
+    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-menu">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+    <nav id="site-menu" class="main-menu" role="navigation">
       ${navItems.map(item => `
         <a href="${item.Href}" class="menu-link ${item.Name === active ? 'menu-link-active' : ''}">${item.Label}</a>
       `).join('')}

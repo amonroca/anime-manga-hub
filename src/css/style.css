@@ -1,8 +1,10 @@
+/* Base styles (mobile-first): calendar section wrapper */
 #calendar-section {
   padding: 0;
   background: none;
   box-shadow: none;
 }
+/* Horizontal scroll list for calendar days (mobile default) */
 .calendar-list {
   display: flex;
   gap: 1.2rem;
@@ -10,6 +12,7 @@
   padding-bottom: 0.5rem;
   margin-top: 1rem;
 }
+/* Card column for a single calendar day */
 .calendar-day-col {
   background: #232526;
   border-radius: 10px;
@@ -21,6 +24,7 @@
   box-shadow: 0 2px 8px #0002;
   padding: 0.5rem 0.5rem 1rem 0.5rem;
 }
+/* Day header inside calendar column */
 .calendar-day-header {
   font-weight: bold;
   font-size: 1.1rem;
@@ -32,10 +36,12 @@
   background: #232526;
   border-radius: 10px 10px 0 0;
 }
+/* Highlight current day */
 .calendar-day-col.today .calendar-day-header {
   background: #646cff;
   color: #fff;
 }
+/* Anime entry card inside a day */
 .calendar-anime-card {
   background: #31343b;
   border-radius: 8px;
@@ -47,6 +53,7 @@
   box-shadow: 0 2px 8px #0003;
   transition: background 0.2s;
 }
+/* Poster thumbnail inside the anime card */
 .calendar-anime-card img {
   width: 90px;
   height: 120px;
@@ -54,6 +61,7 @@
   border-radius: 6px;
   margin-bottom: 0.3rem;
 }
+/* Anime title text in card */
 .calendar-anime-title {
   font-size: 1rem;
   font-weight: bold;
@@ -61,25 +69,15 @@
   text-align: center;
   margin-bottom: 0.2rem;
 }
+/* Aired time/date in card */
 .calendar-anime-date {
   font-size: 0.95rem;
   color: #b3b3b3;
   text-align: center;
 }
 
-@media (max-width: 900px) {
-  .calendar-list {
-    gap: 0.5rem;
-  }
-  .calendar-day-col {
-    min-width: 140px;
-    padding: 0.3rem 0.2rem 0.7rem 0.2rem;
-  }
-  .calendar-anime-card img {
-    width: 70px;
-    height: 90px;
-  }
-}
+/* Mobile-first sizes are defined above. Larger adjustments move to larger.css */
+/* Global tokens and base text rendering */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -95,20 +93,48 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Mobile-first navigation: hamburger closed by default */
+.menu-toggle {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #646cff;
+  padding: 0.4rem;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 100;
+}
+.menu-toggle:hover,
+.menu-toggle:focus { color: #535bf2; outline: 2px solid #646cff55; }
+
+/* Main navigation container (mobile dropdown panel) */
 .main-menu {
   position: absolute;
-  top: 1.5rem;
-  right: 2rem;
-  display: flex;
-  gap: 1.2rem;
-  z-index: 10;
+  top: 3.6rem;
+  right: 0.6rem;
+  display: none; /* hidden by default on mobile */
+  flex-direction: column;
+  gap: 0.4rem;
+  z-index: 90;
+  background: #1a1a1a;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px #0008;
+  padding: 0.6rem;
+  min-width: 180px;
 }
+
+/* Open state: show dropdown */
+body.nav-open .main-menu { display: flex; }
+/* Navigation link (default and hover states) */
 .menu-link {
   color: #646cff;
   font-weight: bold;
   text-decoration: none;
   font-size: 1.1rem;
-  padding: 0.3em 0.8em;
+  padding: 0.5em 0.8em;
+  display: block; /* makes touch targets comfortable in mobile dropdown */
   border-radius: 6px;
   transition: background 0.2s, color 0.2s;
 }
@@ -117,11 +143,13 @@
   color: #fff;
 }
 
+/* Active menu link */
 .menu-link-active {
   background: #535bf2;
   color: #fff;
 }
 
+/* Generic popup overlay */
 .popup-overlay {
   position: fixed;
   top: 0;
@@ -134,6 +162,7 @@
   justify-content: center;
   z-index: 1000;
 }
+/* Generic popup content */
 .popup-content {
   background: #232526;
   border-radius: 12px;
@@ -144,9 +173,8 @@
   overflow-y: auto;
   position: relative;
   color: #fff;
-  scrollbar-width: thin;
-  scrollbar-color: lightgray #232526;
 }
+/* Close button inside popup */
 #close-popup {
   position: absolute;
   top: 0;
@@ -158,9 +186,11 @@
   cursor: pointer;
   padding: 0;
 }
+/* Popup container toggled by JS */
 #details-popup {
   display: none;
 }
+/* Search/result card container */
 .result-card {
   display: flex;
   align-items: flex-start;
@@ -173,23 +203,28 @@
   transition: background 0.2s;
   min-height: 450px;
 }
+/* Hover elevation effect */
 .result-card:hover {
   background: #3a3d44;
 }
+/* Cover image inside result card */
 .result-card .cover-img {
   width: 150px;
   height: 200px;
 }
+/* Info column inside result card */
 .result-card .card-info {
   flex: 1;
   min-width: 0;
 }
+/* Title inside result card */
 .result-card .card-title {
   font-size: 1.3rem;
   font-weight: bold;
   margin-bottom: 0.3rem;
 }
 
+/* Actions area inside result card */
 .result-card .card-actions {
   display: flex;
   gap: 0.5rem;
@@ -197,6 +232,7 @@
   width: 100%;
 }
 
+/* Metadata grid inside result card */
 .result-card .card-meta {
   font-size: 1rem;
   color: #b3b3b3;
@@ -205,15 +241,18 @@
   grid-template-columns: 1fr 1fr;
 }
 
+/* Metadata grid: image placement */
 .card-meta img {
   grid-column: 1 / 2;
   grid-row: span 5;
 }
 
+/* Metadata grid: text placement */
 .card-meta span {
   grid-column: 2 / 3;
 }
 
+/* CTA link to watchlist */
 #watchlist-link {
   display: block;
   margin: 2rem auto 0 auto;
@@ -227,10 +266,12 @@
   text-decoration: none;
   transition: background 0.2s;
 }
+/* CTA hover state */
 #watchlist-link:hover {
   background: #535bf2;
 }
 
+/* Generic back link */
 .back-link {
   font-weight: bold;
   color: #646cff;
@@ -239,10 +280,12 @@
   display: inline-block;
 }
 
+/* Back link hover */
 .back-link:hover {
   color: #535bf2;
 }
 
+/* Anchor defaults */
 a {
   font-weight: 500;
   color: #646cff;
@@ -253,6 +296,7 @@ a:hover {
 }
 
 
+/* Base page background and text */
 body {
   margin: 0;
   min-width: 320px;
@@ -261,6 +305,7 @@ body {
   color: #fff;
 }
 
+/* Header container */
 header {
   background: #1a1a1a;
   padding: 2rem 1rem 1rem 1rem;
@@ -268,12 +313,14 @@ header {
   box-shadow: 0 2px 8px #0002;
 }
 
+/* Header title */
 header h1 {
   margin: 0 0 1rem 0;
   font-size: 2.5rem;
   letter-spacing: 2px;
 }
 
+/* Search form layout */
 #search-form {
   display: flex;
   justify-content: center;
@@ -282,6 +329,7 @@ header h1 {
   align-items: center;
 }
 
+/* Container for search input + button + select */
 .search-bar-wrapper {
   position: relative;
   display: flex;
@@ -290,6 +338,7 @@ header h1 {
   max-width: 100%;
 }
 
+/* Search input and select base */
 #search-input, #search-type {
   padding: 0.9em 1.2em;
   border-radius: 8px;
@@ -297,6 +346,7 @@ header h1 {
   font-size: 1.15rem;
 }
 
+/* Search input sizing (mobile-first full width) */
 #search-input {
   min-width: 320px;
   width: 100%;
@@ -304,6 +354,7 @@ header h1 {
   box-sizing: border-box;
 }
 
+/* Search submit button (icon) */
 #search-btn {
   position: absolute;
   right: 0.5em;
@@ -322,10 +373,12 @@ header h1 {
   width: 2.2em;
   transition: color 0.2s;
 }
+/* Search button interactive states */
 #search-btn:hover, #search-btn:focus {
   color: #535bf2;
 }
 
+/* Select styling for type filter */
 #search-type {
   background: #232526;
   color: #fff;
@@ -333,9 +386,9 @@ header h1 {
   border-radius: 8px;
   font-size: 1.1rem;
   padding: 0.9em 2.2em 0.9em 1.2em;
-  appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+  appearance: none;
   box-shadow: 0 2px 8px #0002;
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
@@ -344,20 +397,20 @@ header h1 {
   min-width: 120px;
 }
 
+/* Focus ring for select */
 #search-type:focus {
   box-shadow: 0 0 0 2px #646cff55;
   border-color: #646cff;
 }
 
+/* Option palette inside select */
 #search-type option {
   background: #232526;
   color: #fff;
 }
 
-/* Ícone de seta customizado */
-.search-bar-wrapper {
-  position: relative;
-}
+/* Custom arrow icon on the select */
+.search-bar-wrapper { position: relative; }
 #search-type {
   background-image: url('data:image/svg+xml;utf8,<svg fill="%23646cff" height="18" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
   background-repeat: no-repeat;
@@ -365,6 +418,7 @@ header h1 {
   background-size: 1.2em;
 }
 
+/* Main content wrapper (grid on mobile, containerized) */
 main {
   display: grid;
   gap: 2rem;
@@ -373,6 +427,7 @@ main {
   padding: 0 1rem;
 }
 
+/* Generic section card */
 section {
   background: #232526;
   border-radius: 12px;
@@ -381,15 +436,17 @@ section {
   min-width: 0;
 }
 
+/* Common flex stacks inside sections */
 #results-section, #details-section, #watchlist-section {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
+/* Results list is a grid; mobile-first sets 1 column, widened in larger.css */
 #results-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: 1.5rem;
 }
 #details-content {
@@ -398,6 +455,7 @@ section {
   gap: 1rem;
 }
 
+/* Result item container */
 #results-list > div {
   background: #31343b;
   border-radius: 8px;
@@ -413,12 +471,14 @@ section {
   background: #3a3d44;
 }
 
+/* Watchlist UL reset */
 #watchlist {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
+/* Reusable image sizes */
 img.character-img, img.cover-img {
   width: 60px;
   height: 80px;
@@ -427,6 +487,7 @@ img.character-img, img.cover-img {
   box-shadow: 0 2px 8px #0005;
 }
 
+/* Generic button styles (primary) */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -439,11 +500,13 @@ button {
   cursor: pointer;
   transition: border-color 0.25s, background 0.2s;
 }
+/* Button hover */
 button:hover {
   border-color: #535bf2;
   background: #535bf2;
 }
 
+/* Footer */
 footer {
   text-align: center;
   padding: 1.5rem 0 0.5rem 0;
@@ -451,43 +514,17 @@ footer {
   font-size: 1rem;
 }
 
-@media (max-width: 1100px) {
-  #results-list {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (max-width: 700px) {
-  #results-list {
-    grid-template-columns: 1fr;
-  }
-}
-@media (max-width: 900px) {
-  main {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  aside {
-    order: 3;
-  }
-}
+/* Responsive adjustments for larger screens are now defined in larger.css */
 
-@media (max-width: 600px) {
-  header h1 {
-    font-size: 1.5rem;
-  }
-  main {
-    padding: 0 0.2rem;
-  }
-  section, aside {
-    padding: 1rem 0.5rem;
-  }
-}
+/* Minimal mobile tweaks stay as defaults above; larger variants in larger.css */
 
+/* Generic h1 sizing for landing pages */
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
 
+/* App wrapper (demo styles kept) */
 #app {
   max-width: 1280px;
   margin: 0 auto;
@@ -531,7 +568,8 @@ h1 {
       overflow: hidden;
       text-overflow: ellipsis;
       display: -webkit-box;
-      -webkit-line-clamp: 2;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
       -webkit-box-orient: vertical;
     }
     .result-card .card-actions {
@@ -543,6 +581,7 @@ h1 {
   text-align: center;
 }
 
+/* Logo demo styles (kept from Vite template) */
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -556,14 +595,17 @@ h1 {
   filter: drop-shadow(0 0 2em #f7df1eaa);
 }
 
+/* Card demo */
 .card {
   padding: 2em;
 }
 
+/* Docs hint styling */
 .read-the-docs {
   color: #888;
 }
 
+/* Secondary button demo styles (kept from template) */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -575,14 +617,17 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+/* Secondary hover */
 button:hover {
   border-color: #646cff;
 }
+/* Focus ring */
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Light color scheme adjustments */
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -593,6 +638,7 @@ button:focus-visible {
   }
 }
 
+/* Grid for favorites page */
 .favorites-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -603,7 +649,7 @@ button:focus-visible {
   text-align: center;
 }
 
-/* Episódios - estilos para episodeTemplate */
+/* Episodes list item styling (used by Episodes page) */
 .episode-item {
   display: flex;
   flex-direction: column;
@@ -662,12 +708,13 @@ button:focus-visible {
   background: #4f46e5;
 }
 
+/* Episodes list grid; mobile-first single column */
 #episodes-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 1fr;
   gap: 1.5rem;
 }
 
@@ -681,3 +728,183 @@ button:focus-visible {
   margin-bottom: 1rem;
   text-align: center;
 }
+
+/* ==========================
+   Home page layout (scoped)
+   Use body.home to apply these styles only on the landing page
+   ========================== */
+
+/* Home: main layout as a vertical flex stack (mobile-first) */
+.home main {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 0.2rem; /* tighter on mobile; widened in larger.css */
+}
+
+/* Section card styles used on home for horizontal/vertical blocks */
+.home .section-horizontal,
+.home .section-vertical {
+  background: #232526;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px #0003;
+  padding: 1rem 0.5rem; /* mobile-first compact padding */
+  margin-bottom: 1.5rem;
+  min-width: 0;
+}
+
+/* Section header with filters (title + controls) */
+.home .section-header {
+  display: flex;
+  flex-direction: column; /* mobile: title on top, centered */
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+.home .section-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: 1px;
+  text-align: center; /* center the section title on mobile */
+  width: 100%;
+}
+
+/* Filter controls (selects and buttons) */
+.home .filters {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+.home .filters select,
+.home .filters button {
+  border-radius: 8px;
+  border: none;
+  padding: 0.6em 1.1em;
+  font-size: 1em;
+  background: #31343b;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.home .filters select:focus,
+.home .filters button:focus { outline: 2px solid #646cff; }
+.home .filters button { background: #646cff; color: #fff; font-weight: bold; }
+.home .filters button:hover { background: #535bf2; }
+
+/* Horizontal carousel list for recommendations */
+.home .carousel-list {
+  display: flex;
+  gap: 0.7rem; /* tighter on mobile */
+  overflow-x: auto;
+  padding: 1rem;
+  scroll-snap-type: x mandatory;
+  align-items: stretch;
+}
+.home .carousel-list::-webkit-scrollbar { height: 8px; }
+.home .carousel-list::-webkit-scrollbar-thumb { background: #646cff; border-radius: 4px; }
+.home .carousel-list::-webkit-scrollbar-track { background: #232526; }
+
+/* Optional, non-blocking scrollbar styling for supported browsers only */
+@supports (scrollbar-color: auto) or (scrollbar-width: thin) {
+  .popup-content {
+    scrollbar-width: thin;
+    scrollbar-color: lightgray #232526;
+  }
+  .home .carousel-list {
+    scrollbar-width: thin;
+    scrollbar-color: #646cff #232526;
+  }
+}
+
+/* WebKit fallback (Safari/Chrome) */
+.popup-content::-webkit-scrollbar { width: 8px; }
+.popup-content::-webkit-scrollbar-thumb { background: lightgray; border-radius: 4px; }
+.popup-content::-webkit-scrollbar-track { background: #232526; }
+
+/* Carousel item card */
+.home .carousel-item {
+  flex: 0 0 auto;
+  width: 170px;    /* mobile base (increased) */
+  min-width: 170px;
+  max-width: 180px;
+  background: #232526;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px #0005;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s, box-shadow 0.25s;
+  scroll-snap-align: center;
+  animation: fadeInCard 0.7s;
+}
+.home .carousel-item:hover { transform: scale(1.06) translateY(-6px); box-shadow: 0 8px 32px #646cff55; }
+
+.home .carousel-item .card-image { position: relative; width: 100%; height: 250px; overflow: hidden; }
+.home .carousel-item .card-image img { width: 100%; height: 100%; object-fit: cover; border-radius: 18px 18px 0 0; display: block; }
+
+.home .carousel-item .card-overlay {
+  position: absolute; bottom: 0; left: 0; width: 100%; height: 60px;
+  background: linear-gradient(180deg, transparent 0%, #232526 100%);
+  display: flex; align-items: flex-end; justify-content: center; padding-bottom: 0.7rem;
+}
+.home .carousel-item .card-title {
+  position: absolute; bottom: 8px; left: 28%; transform: translateX(-25%);
+  background: rgba(40,40,60,0.85); color: #fff; font-size: 0.95rem; font-weight: bold;
+  padding: 0.2em 0.5em; border-radius: 8px; box-shadow: 0 2px 8px #0002; text-align: center;
+  min-width: 135px; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical;
+  overflow: hidden; text-overflow: ellipsis; max-height: 4.5em;
+}
+.home .carousel-item .card-badges { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 0.5em; width: 100%; position: absolute; top: 12px; }
+.home .carousel-item .badge { background: #646cff; color: #fff; font-size: 0.85rem; font-weight: bold; padding: 0.2em 0.7em; border-radius: 6px; box-shadow: 0 2px 8px #0002; }
+.home .carousel-item .card-actions { position: absolute; top: 50%; right: 50%; transform: translate(50%, -50%); display: flex; flex-direction: row; gap: 0.5rem; z-index: 2; }
+.home .carousel-item .action-btn {
+  background: rgba(40,40,60,0.85); color: #fff; border: none; border-radius: 20%; width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 2px 8px #0002; transition: background 0.2s;
+}
+.home .carousel-item .action-btn:hover { background: #646cff; }
+.home .carousel-item .card-desc { padding: 0.5rem; font-size: 0.92rem; color: #ccc; text-align: center; min-height: 2.5em; max-height: 4.5em; overflow: hidden; }
+
+@keyframes fadeInCard { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
+
+/* Two vertical sections (Anime/Manga news) side-by-side on larger screens; stacked on mobile */
+.home .section-columns { display: flex; flex-direction: column; gap: 1.2rem; margin-bottom: 2rem; }
+
+/* News list and cards */
+.home .news-list { display: flex; flex-direction: column; gap: 1.2rem; }
+.home .news-card { display: flex; gap: 1rem; background: #31343b; border-radius: 10px; padding: 0.8rem 1rem; align-items: flex-start; box-shadow: 0 2px 8px #0002; position: relative; }
+.home .news-card img { width: 80px; height: 80px; object-fit: cover; border-radius: 7px; }
+.home .news-card .news-content { flex: 1; }
+.home .news-card .news-title { font-size: 1.08rem; font-weight: bold; color: #fff; margin-bottom: 0.2rem; }
+.home .news-card .news-summary { font-size: 0.97rem; color: #ccc; }
+.home .news-card .news-comments { position: absolute; bottom: 0.5rem; right: 0.7rem; font-size: 1.2rem; color: #ff6a00; }
+.home .news-card .news-date { font-size: 0.9rem; color: #aaa; margin-right: 1rem; }
+.home .news-card .news-author { font-size: 0.9rem; color: #aaa; }
+.home .news-card .news-forum { display: inline-block; margin-top: 0.5rem; font-size: 0.9rem; color: #646cff; text-decoration: none; }
+.home .news-card .news-forum:hover { text-decoration: underline; }
+.home .news-card .news-meta { display: flex; gap: 1rem; margin-top: 0.3rem; align-items: center; }
+
+/* Upcoming release card styling (used on home) */
+.home .release-card { background: #31343b; border-radius: 10px; padding: 1rem; box-shadow: 0 2px 8px #0003; }
+.home .upcoming-card {
+  position: relative; background: #232526; border-radius: 14px; box-shadow: 0 2px 12px #0003;
+  min-width: 180px; max-width: 200px; display: flex; flex-direction: column; align-items: center;
+  margin-right: 1.2rem; overflow: hidden; transition: box-shadow 0.2s; top: 1rem; left: 0.7rem; padding-bottom: 0.7rem;
+}
+.home .upcoming-card img { width: 100%; height: 285px; object-fit: cover; border-radius: 14px 14px 0 0; box-shadow: 0 2px 8px #0002; }
+.home .upcoming-card .release-date { position: absolute; top: 10px; left: 16%; background: #aaa; color: #fff; font-weight: bold; font-size: 1.05rem; padding: 0.3em 0.7em; border-radius: 8px; box-shadow: 0 2px 8px #0002; z-index: 2; }
+.home .upcoming-card .upcoming-title { font-size: 1.08rem; font-weight: bold; color: #fff; text-align: center; margin: 0.7rem 0 0.3rem 0; padding: 0 0.5rem; word-break: break-word; }
+.home .upcoming-card .upcoming-type { font-size: 0.95rem; color: #b3b3b3; margin-bottom: 0.3rem; text-align: center; }
+.home .upcoming-card .upcoming-synopsis { font-size: 0.92rem; color: #ccc; margin-bottom: 0.7rem; padding: 0 0.5rem; text-align: center; max-height: 3.5em; overflow: hidden; }
+.home .upcoming-card .upcoming-rating { text-align: center; font-size: 0.9rem; color: #b3b3b3; margin-top: 0.3rem; }
+.home .upcoming-card .upcoming-trailer { padding: 0.4em 1em; border-radius: 8px; }
+.home .upcoming-card:hover { box-shadow: 0 8px 32px #646cff55; }
+
+/* Disabled button utility (used across components) */
+.home .btn-disabled { background: #555 !important; cursor: not-allowed !important; }
