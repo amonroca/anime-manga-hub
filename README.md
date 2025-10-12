@@ -95,17 +95,6 @@ A lightweight hub to explore anime and manga using the Jikan v4 API (with Kitsu 
 - Some endpoints may occasionally respond with 429; the global limiter mitigates this.
 - UI strings are being standardized to English; feel free to refine copy and accessibility attributes.
 
-## Screenshots (optional)
-
-You can add screenshots or short GIFs to the `docs/` folder and reference them here, e.g.:
-
-```
-![Home](docs/screens/home.png)
-![Search](docs/screens/search.png)
-```
-
-Keeping images near the project helps contributors quickly understand the UI.
-
 ## Troubleshooting
 
 - HTTP 429 from Jikan:
