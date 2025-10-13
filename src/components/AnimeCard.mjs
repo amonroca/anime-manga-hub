@@ -3,7 +3,7 @@
 // and the current state of the favorite button. Interaction (clicks) is
 // handled by the consumer of this component (e.g., utils.renderResults binds the buttons).
 
-import { isFavorite } from "./utils.js";
+import { isFavorite } from "../lib/utils.js";
 
 /**
  * Builds the HTML for an anime card.

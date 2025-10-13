@@ -8,10 +8,10 @@
  * - Enrich episode items with a stable id and the anime title
  * - Render the episodes list and page title
  */
-import { renderEpisodesList } from './utils.js';
-import Menu from './Menu.mjs';
-import Footer from './Footer.mjs';
-import { getAnimeEpisodes } from './api.js';
+import { renderEpisodesList } from '../lib/utils.js';
+import Menu from '../components/Menu.mjs';
+import Footer from '../components/Footer.mjs';
+import { getAnimeEpisodes } from '../lib/api.js';
 
 const menu = new Menu();
 const footer = new Footer();

@@ -1,49 +1,49 @@
-// Compact card used in the recommendations carousel for Manga entries.
-// Very similar to AnimeRecommendation, but reads `published` instead of `aired` for year.
-import { isFavorite } from "./utils.js";
+// Compact card used in the recommendations carousel for Anime entries.
+// Renders a small image card with action buttons and dynamic badges.
+import { isFavorite } from "../lib/utils.js";
 
 /**
- * Builds the HTML snippet for a manga recommendation card.
- * - Expects `manga.entry` shape from Jikan recommendations endpoint.
+ * Builds the HTML snippet for an anime recommendation card.
+ * - Expects `anime.entry` shape from Jikan recommendations endpoint.
  */
-function mangaRecommendationTemplate(manga) {
-  const title = manga.entry.title || 'No title';
-  const imageUrl = manga.entry.images?.webp?.image_url || '';
-  const fav = isFavorite(manga.entry.mal_id);
+function animeRecommendationTemplate(anime) {
+  const title = anime.entry.title || 'No title';
+  const imageUrl = anime.entry.images?.webp?.image_url || '';
+  const fav = isFavorite(anime.entry.mal_id);
 
   return `
     <div class="card-image">
       <img src="${imageUrl}" alt="${title}" />
       <div class="card-actions">
-        <button id="details-manga-btn" class="action-btn" title="Details">🔍</button>
-        <button id="favorite-manga-btn" class="action-btn" title="Favorite">${fav ? '★' : '☆'}</button>
+        <button id="details-anime-btn" class="action-btn" title="Details">🔍</button>
+        <button id="favorite-anime-btn" class="action-btn" title="Favorite" data-fav="${fav ? '1' : '0'}">${fav ? '★' : '☆'}</button>
       </div>
     </div>
     <h3 class="card-title">${title}</h3>
-    `;
+  `;
 }
 
-export default class MangaRecommendation {
+export default class AnimeRecommendation {
   /**
-   * @param {object} manga - Recommendation object containing `entry`
+   * @param {object} anime - Recommendation object containing `entry`
    */
-  constructor(manga) {
-    this.manga = manga;
+  constructor(anime) {
+    this.anime = anime;
   }
 
   /**
    * Returns the base HTML (image + buttons + title).
    */
   render() {
-    return mangaRecommendationTemplate(this.manga);
+    return animeRecommendationTemplate(this.anime);
   }
 
   /**
    * Builds dynamic badges based on full details fetched lazily:
    * - score (★x.x)
    * - first genre name
-   * - published year
-   * @param {object} details - object from Jikan full details endpoint (manga)
+   * - aired year
+   * @param {object} details - object from Jikan full details endpoint
    * @returns {HTMLDivElement} DOM node with badges
    */
   renderBadges(details) {
@@ -64,10 +64,10 @@ export default class MangaRecommendation {
       container.appendChild(genreBadge);
     }
 
-    if (details.published?.from) {
+    if (details.aired?.from) {
       const yearBadge = document.createElement('span');
       yearBadge.className = 'badge';
-      yearBadge.textContent = details.published?.prop?.from?.year;
+      yearBadge.textContent = details.aired.prop.from.year;
       container.appendChild(yearBadge);
     }
 

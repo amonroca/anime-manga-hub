@@ -7,9 +7,9 @@
  * - Render separate lists for Anime and Manga favorites
  * - Allow removing an item using utils.removeFavorite() and re-render the list
  */
-import { getFavorites, removeFavorite } from './utils.js';
-import Menu from './Menu.mjs';
-import Footer from './Footer.mjs';
+import { getFavorites, removeFavorite } from '../lib/utils.js';
+import Menu from '../components/Menu.mjs';
+import Footer from '../components/Footer.mjs';
 
 // Pass the current section to highlight the active nav item if supported by Menu
 const menu = new Menu('favorites');

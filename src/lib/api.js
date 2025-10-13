@@ -251,7 +251,7 @@ export async function getAnimeStreamingLinks(mal_id) {
   }
 }
 
-// Retrieve seasonal anime for a given year and season
+// Retrieve broadcast schedules.
 /**
  * Retrieve broadcast schedules.
  * @returns {Promise<any[]>}
@@ -328,7 +328,7 @@ export async function getMangaRecommendation(mal_id) {
   }
 }
 
-// Retrieve news articles for an anime by MAL ID
+// Retrieve anime news by MAL ID
 /**
  * Retrieve news for a given anime.
  * @param {number|string} mal_id
@@ -344,7 +344,7 @@ export async function getAnimeNews(mal_id) {
   }
 }
 
-// Retrieve news articles for a manga by MAL ID
+// Retrieve manga news by MAL ID
 /**
  * Retrieve news for a given manga.
  * @param {number|string} mal_id
@@ -360,7 +360,7 @@ export async function getMangaNews(mal_id) {
   }
 }
 
-// Retrieve anime details by MAL ID
+// Retrieve a single anime by MAL ID
 /**
  * Retrieve a single anime by MAL ID (basic endpoint).
  * @param {number|string} mal_id
@@ -376,7 +376,7 @@ export async function getAnimeById(mal_id) {
   }
 }
 
-// Retrieve manga details by MAL ID
+// Retrieve a single manga by MAL ID
 /**
  * Retrieve a single manga by MAL ID (basic endpoint).
  * @param {number|string} mal_id
@@ -392,7 +392,7 @@ export async function getMangaById(mal_id) {
   }
 }
 
-// Retrieve anime genres
+// Retrieve list of anime genres
 /**
  * Retrieve list of anime genres.
  * @returns {Promise<any[]>}
@@ -407,7 +407,7 @@ export async function getAnimeGenres() {
   }
 }
 
-// Retrieve manga genres
+// Retrieve list of manga genres
 /**
  * Retrieve list of manga genres.
  * @returns {Promise<any[]>}
@@ -422,7 +422,7 @@ export async function getMangaGenres() {
   }
 }
 
-// Retrieve seasonal anime for a specific year and season
+// Retrieve upcoming seasonal anime
 /**
  * Retrieve upcoming seasonal anime.
  * @param {number} [page=1]
@@ -438,7 +438,7 @@ export async function getSeasonUpcoming(page = 1) {
   }
 }
 
-// Retrieve anime episodes for a specific anime by MAL ID
+// Retrieve episodes for a specific anime by MAL ID
 /**
  * Retrieve episodes for a given anime.
  * @param {number|string} mal_id

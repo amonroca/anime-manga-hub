@@ -1,8 +1,8 @@
 // Main JS entry point
 // Sets up event listeners, initializes components, and manages state for the application.
-import Menu from './Menu.mjs';
-import Footer from './Footer.mjs';
-import { renderNewsList, renderRecommendations, renderUpcomingReleases, getRecommendations, fillGenresFilter, getCacheByType } from './utils'; 
+import Menu from '../components/Menu.mjs';
+import Footer from '../components/Footer.mjs';
+import { renderNewsList, renderRecommendations, renderUpcomingReleases, getRecommendations, fillGenresFilter, getCacheByType } from '../lib/utils.js'; 
 
 // Initializations
 const menu = new Menu('home');
@@ -45,6 +45,19 @@ window.addEventListener('DOMContentLoaded', async () => {
 	await renderUpcomingReleases(upcomingReleasesList);
 
 });
+
+	// Adapt button labels based on viewport: 'More' on small screens, 'See more' otherwise
+	function updateMoreButtonsLabel() {
+		const isSmall = window.matchMedia('(max-width: 400px)').matches;
+		const animeBtn = document.getElementById('anime-more-btn');
+		const mangaBtn = document.getElementById('manga-more-btn');
+		if (animeBtn) animeBtn.textContent = isSmall ? 'More' : 'See more';
+		if (mangaBtn) mangaBtn.textContent = isSmall ? 'More' : 'See more';
+	}
+
+	// Initial label set and on resize
+	updateMoreButtonsLabel();
+	window.addEventListener('resize', updateMoreButtonsLabel);
 
 // Set initial pagination state
 sessionStorage.setItem('animeRcPage', animeRcPage);

@@ -7,10 +7,10 @@
  * - Handle search submissions (anime or manga) using Jikan API via api.js
  * - Render results into the results list container
  */
-import Menu from './Menu.mjs';
-import { searchJikan, getTopAnimes } from './api.js';
-import { renderResults } from './utils.js';
-import Footer from './Footer.mjs';
+import Menu from '../components/Menu.mjs';
+import { searchJikan, getTopAnimes } from '../lib/api.js';
+import { renderResults } from '../lib/utils.js';
+import Footer from '../components/Footer.mjs';
 
 const menu = new Menu('search');
 const footer = new Footer();

@@ -1,6 +1,6 @@
 # Anime & Manga Hub
 
-A lightweight hub to explore anime and manga using the Jikan v4 API (with Kitsu fallback for upcoming releases). Built with Vite and ES Modules.
+A lightweight hub to explore anime and manga using the Jikan v4 API, with Kitsu as a fallback for upcoming releases. Built with Vite (MPA) and ES Modules.
 
 ## Features
 
@@ -12,105 +12,123 @@ A lightweight hub to explore anime and manga using the Jikan v4 API (with Kitsu 
 
 ## Architecture
 
-- UI: Vanilla JS modules; small components for cards, lists, and pages
-- API: Centralized module with a global rate limiter (queue, min interval, per-minute cap, retries)
-- Storage: localStorage (favorites, watchlist), sessionStorage (details cache)
-- Build: Vite (dev/build/preview)
+High level
 
-## Key Modules
+- Presentation: vanilla JS modules + small UI components (cards, lists, badges, footer)
+- Library (domain): API client with global rate limiter, utilities for rendering/state
+- Data: small static assets like the navigation menu JSON
+- Build: Vite in MPA mode (multi HTML entries)
 
-- `src/js/api.js` — All remote calls wrapped by a global rate limiter
-- `src/js/utils.js` — Rendering helpers, storage helpers, and small UI utilities
-- Components: `AnimeCard.mjs`, `MangaCard.mjs`, `Releases.mjs`, `Episodes.mjs`, `AnimeNews.mjs`, `MangaNews.mjs`
-- Pages: `search.js`, `favorites.js`, `watchlist.js`, `episodes.js`
+Flow (happy path)
+
+1. Page entry (`src/js/*.js`) wires header/footer and page-specific logic
+2. UI components (`src/components/*`) render HTML snippets (no side effects)
+3. Utilities (`src/lib/utils.js`) orchestrate rendering, favorites/watchlist, caching
+4. API client (`src/lib/api.js`) executes HTTP calls through a global queue with:
+   - Min interval between requests (~550ms)
+   - Per-minute cap
+   - Retries for 429/5xx with backoff, honoring `Retry-After` when present
+
+Decisions & trade-offs
+
+- Keep it framework-free (vanilla ESM) for small footprint and transparency
+- Centralized rate limiting prevents scattered throttles and reduces 429
+- Storage split: localStorage (long-lived state), sessionStorage (page/session cache)
+- CSS: mobile-first base + larger-screen overrides; guard advanced features with `@supports`
 
 ## Project Structure
 
 ```
-.
-├─ index.html
-├─ package.json
-├─ public/
-│  └─ vite.svg
-├─ src/
-│  ├─ main.js
-│  ├─ style.css
-│  └─ js/
-│     ├─ api.js
-│     ├─ utils.js
-│     ├─ Menu.mjs
-│     ├─ Footer.mjs
-│     ├─ AnimeCard.mjs / MangaCard.mjs
-│     ├─ AnimeNews.mjs / MangaNews.mjs
-│     ├─ Releases.mjs / Episodes.mjs
-│     ├─ search.js / favorites.js / watchlist.js / episodes.js
-│     └─ Watchlist.mjs
-└─ README.md
+src/
+  components/       # UI components (cards, lists, footer, etc.)
+  data/             # Static data (e.g., menu.json)
+  js/               # Page entry scripts (home, search, favorites, watchlist, episodes) + Menu.mjs
+  lib/              # Library layer (api.js, utils.js)
+  styles/           # CSS mobile-first (style.css) + larger screens (larger.css)
+  *.html            # Pages (MPA entries)
 ```
 
-## Rate Limiting
+Key modules/components
 
-- Min interval ~550ms between requests
-- 60 requests/minute cap
-- Retries with exponential backoff; respects Retry-After header when present
+- `src/lib/api.js`: API access with a global rate limiter
+- `src/lib/utils.js`: rendering, storage and UI helpers
+- `src/components/*`: `AnimeCard`, `MangaCard`, `AnimeRecommendation`, `MangaRecommendation`, `AnimeNews`, `MangaNews`, `Releases`, `Episodes`, `Watchlist`, `Footer`
+- `src/js/Menu.mjs`: responsive nav (hamburger + desktop) fed by `src/data/menu.json`
+- `src/styles/style.css` (base), `src/styles/larger.css` (overrides)
 
-## Storage
+## Scripts
 
-- Favorites: `localStorage['favorites']`
-- Watchlist: `localStorage['watchlist']`
-- Details cache: `sessionStorage`
+- `npm run dev` — start dev server (Vite)
+- `npm run build` — production build
+- `npm run preview` — preview the production build
 
-### Data shapes
+Notes
 
-- Favorite item:
-  - `{ id: string|number, type: 'Anime'|'Manga', title: string, image: string }`
-- Watchlist item:
-  - `{ id: string, anime_title: string, mal_id: number, episode_title: string, url: string }`
+- PDF generation was removed; there is no `npm run pdf` script anymore
+- MPA inputs are configured in `vite.config.js`
 
-## Pages and Routes
+## Getting started
 
-- Home (`index.html`): highlights and entry points
-- Search (`src/js/search.js`): search form, top anime on load, results rendering
-- Favorites (`src/js/favorites.js`): list and remove favorites
-- Watchlist (`src/js/watchlist.js`): render saved episodes and remove entries
-- Episodes (`src/js/episodes.js`): list episodes for a specific anime (expects `?animeId=...&animeTitle=...`)
+1. Install dependencies
 
-## Development
+```powershell
+npm install
+```
 
-- Start dev server: `npm run dev`
-- Build: `npm run build`
-- Preview build: `npm run preview`
+2. Development
 
-### Getting Started
+```powershell
+npm run dev
+```
 
-1. Install Node.js LTS (v18+ recomendado)
-2. Install dependencies:
-   - `npm install`
-3. Run dev server:
-   - `npm run dev`
-4. Open the printed local URL in your browser
+3. Production build
 
-## Notes
+```powershell
+npm run build
+```
 
-- Some endpoints may occasionally respond with 429; the global limiter mitigates this.
-- UI strings are being standardized to English; feel free to refine copy and accessibility attributes.
+4. Preview build
+
+```powershell
+npm run preview
+```
+
+## Implementation notes
+
+- Rate limiting: all Jikan calls go through a global queue (min interval, per-minute cap, retries on 429/5xx, honors `Retry-After`)
+- Accessibility: consistent headings, proper labels, hamburger `aria-expanded`, close on Escape and link click
+- State: favorites/watchlist in localStorage; details/pagination cache in sessionStorage
+- CSS: mobile-first base + `@supports`-guarded scrollbar styling with WebKit fallback
+
+## Menu structure
+
+Defined in `src/data/menu.json`:
+
+```json
+[
+  { "Id": 1, "Name": "home", "Label": "Home", "Href": "index.html" },
+  { "Id": 2, "Name": "search", "Label": "Search", "Href": "search.html" },
+  {
+    "Id": 3,
+    "Name": "watchlist",
+    "Label": "Watchlist",
+    "Href": "watchlist.html"
+  },
+  {
+    "Id": 4,
+    "Name": "favorites",
+    "Label": "Favorites",
+    "Href": "favorites.html"
+  }
+]
+```
 
 ## Troubleshooting
 
-- HTTP 429 from Jikan:
-  - Requests are queued and rate-limited globally, but bursty user actions can still collide with upstream limits.
-  - Try slower interactions or wait a few seconds; the limiter retries with backoff and honors Retry-After.
-- CORS or network errors during dev:
-  - Ensure you are running through the Vite dev server (`npm run dev`).
-  - Check browser console for blocked requests and ad-blockers.
-- Empty sections in UI:
-  - Many widgets rely on network responses; transient failures return empty arrays to keep the UI responsive.
-  - Try refreshing the page or inspecting the console for warnings.
+- 429 Too Many Requests: limiter will pause and retry; wait a few seconds and try again
+- Menu not showing: ensure `src/js/Menu.mjs` is included and `src/data/menu.json` exists
+- “npm run pdf” fails: the script was removed and is no longer supported
 
-## Contributing
-
-Contributions are welcome. Please open an issue or submit a PR with a clear description and minimal changes.
-
-## License
+---
 
 MIT (see LICENSE if/when added)

@@ -20,9 +20,6 @@
     padding: 0;
     min-width: 0;
   }
-  .calendar-list { gap: 1.2rem; }
-  .calendar-day-col { min-width: 180px; padding: 0.5rem 0.5rem 1rem 0.5rem; }
-  .calendar-anime-card img { width: 90px; height: 120px; }
 }
 
 /* Header title gets larger on wider screens */
@@ -50,8 +47,8 @@
     flex-wrap: nowrap; /* keep title and filters on the same line */
   }
   .home .section-header h2 {
-    text-align: left; /* volta a alinhar à esquerda no desktop */
-    width: auto;      /* evita ocupar 100% e empurrar filtros para baixo */
+    text-align: left; /* align back to the left on desktop */
+    width: auto;      /* avoid taking 100% width and pushing filters below */
   }
   .home .section-columns { flex-direction: row; gap: 2rem; }
   .home .carousel-list { gap: 2rem; }

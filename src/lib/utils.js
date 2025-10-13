@@ -1,14 +1,14 @@
 // Utilities for rendering cards, lists, and UI behaviors across pages.
 // This file wires UI components to API data and manages local/session storage state.
 // Note: All API rate limiting is centralized in api.js; avoid adding ad-hoc throttles here.
-import AnimeCard from './AnimeCard.mjs';
-import MangaCard from './MangaCard.mjs';
-import AnimeNews from './AnimeNews.mjs';
-import MangaNews from './MangaNews.mjs'; 
-import Releases from './Releases.mjs';
-import Episodes from './Episodes.mjs';
-import AnimeRecommendation from './AnimeRecommendation.mjs';
-import MangaRecommendation from './MangaRecommendation.mjs';
+import AnimeCard from '../components/AnimeCard.mjs';
+import MangaCard from '../components/MangaCard.mjs';
+import AnimeNews from '../components/AnimeNews.mjs';
+import MangaNews from '../components/MangaNews.mjs'; 
+import Releases from '../components/Releases.mjs';
+import Episodes from '../components/Episodes.mjs';
+import AnimeRecommendation from '../components/AnimeRecommendation.mjs';
+import MangaRecommendation from '../components/MangaRecommendation.mjs';
 import { getCharacters, getDetails, getAnimeStreamingLinks, getRecentAnimeRecommendations, getAnimeRecommendation, 
     getRecentMangaRecommendations, getMangaRecommendation, getAnimeGenres, getMangaGenres, getAnimeNews, getMangaNews,
     getSeasonUpcoming } from "./api";
@@ -542,12 +542,12 @@ function bindFavoriteButton(htmlElement, item) {
         
         if (isFav) {
             removeFavorite(mal_id);
-            htmlElement.textContent = htmlElement.textContent.includes('Favorite') ?  '☆ Favorite' : '☆';
+            htmlElement.textContent = htmlElement.textContent.includes('Favorite') ?  '\u2606 Favorite' : '\u2606';
             htmlElement.setAttribute('data-fav', '0');
         } else {
             addFavorite(item);
             console.log(htmlElement.textContent);
-            htmlElement.textContent = htmlElement.textContent.includes('Favorite') ?  '★ Favorite' : '★';
+            htmlElement.textContent = htmlElement.textContent.includes('Favorite') ?  '\u2605 Favorite' : '\u2605';
             htmlElement.setAttribute('data-fav', '1');
         }
     });

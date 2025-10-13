@@ -36,23 +36,10 @@ function animeNewsTemplate(news) {
   `;
 }
 
-/**
- * Simple component wrapper for an anime news item.
- * Keeps the original object and provides a render() method to generate HTML.
- */
 export default class AnimeNews {
-  /**
-   * @param {Object} anime - News item payload (see animeNewsTemplate JSDoc for shape).
-   */
   constructor(anime) {
-    /** @type {Object} raw news item */
     this.anime = anime;
   }
-
-  /**
-   * Render the news card HTML.
-   * @returns {string}
-   */
   render() {
     return animeNewsTemplate(this.anime);
   }

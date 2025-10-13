@@ -8,8 +8,8 @@
  * - Handle item removal (update storage and re-render)
  */
 import Menu from "./Menu.mjs";
-import Footer from "./Footer.mjs";
-import Watchlist from "./Watchlist.mjs";
+import Footer from "../components/Footer.mjs";
+import Watchlist from "../components/Watchlist.mjs";
 
 const menu = new Menu('watchlist');
 const footer = new Footer();

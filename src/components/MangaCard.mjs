@@ -1,7 +1,7 @@
 // Card component to display a Manga in lists/results.
 // Generates an HTML string with basic manga information and the favorite state.
 // Button interactions are wired by the consumer (e.g., utils.renderResults).
-import { isFavorite } from "./utils.js";
+import { isFavorite } from "../lib/utils.js";
 
 /**
  * Builds the HTML for a manga card.

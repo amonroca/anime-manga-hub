@@ -36,22 +36,10 @@ function mangaNewsTemplate(manga) {
   `;
 }
 
-/**
- * Simple component wrapper for a manga news item.
- */
 export default class MangaNews {
-  /**
-   * @param {Object} manga - News item payload (see mangaNewsTemplate JSDoc for shape).
-   */
   constructor(manga) {
-    /** @type {Object} raw news item */
     this.manga = manga;
   }
-
-  /**
-   * Render the news card HTML.
-   * @returns {string}
-   */
   render() {
     return mangaNewsTemplate(this.manga);
   }

@@ -1,0 +1,6 @@
+[
+  { "Id": 1, "Name": "home", "Label": "Home", "Href": "index.html" },
+  { "Id": 2, "Name": "search", "Label": "Search", "Href": "search.html" },
+  { "Id": 3, "Name": "watchlist", "Label": "Watchlist", "Href": "watchlist.html" },
+  { "Id": 4, "Name": "favorites", "Label": "Favorites", "Href": "favorites.html" }
+]
