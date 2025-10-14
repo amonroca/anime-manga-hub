@@ -7,7 +7,7 @@
  * - Render full list using Watchlist component
  * - Handle item removal (update storage and re-render)
  */
-import Menu from "./Menu.mjs";
+import Menu from "../components/Menu.mjs";
 import Footer from "../components/Footer.mjs";
 import Watchlist from "../components/Watchlist.mjs";
 

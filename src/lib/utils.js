@@ -11,7 +11,8 @@ import AnimeRecommendation from '../components/AnimeRecommendation.mjs';
 import MangaRecommendation from '../components/MangaRecommendation.mjs';
 import { getCharacters, getDetails, getAnimeStreamingLinks, getRecentAnimeRecommendations, getAnimeRecommendation, 
     getRecentMangaRecommendations, getMangaRecommendation, getAnimeGenres, getMangaGenres, getAnimeNews, getMangaNews,
-    getSeasonUpcoming } from "./api";
+    getSeasonUpcoming, getSoundtracks } from "./api";
+import Soundtracks from '../components/Soundtracks.mjs';
 
 /**
  * Get favorites from localStorage.
@@ -483,6 +484,7 @@ async function showDetails(mal_id, type) {
     let trailerEmbed = '';
     let animeStreaming = '';
     let animeEpisodes = '';
+    let soundtrackHtml = '';
 
     // Check if trailer exists and set up HTML
     if (details.trailer?.embed_url) {
@@ -495,8 +497,20 @@ async function showDetails(mal_id, type) {
     }
 
     // Set up episodes HTML if applicable
-    if (details.type !== 'Movie') {
+    if (details.type !== 'Movie' && type === 'anime') {
         animeEpisodes = `<h4>Episodes</h4><p>Total Episodes: ${details.episodes || 'N/A'} <a href="episodes.html?animeId=${details.mal_id}&animeTitle=${details.title}">(See all episodes)</a></p>`;
+    }
+
+    if (type === 'anime') {
+        // Attempt to fetch soundtracks using a reasonable title candidate
+        try {
+            const stTitle = details.title_english || details.title || details.title_japanese || '';
+            const tracks = await getSoundtracks(stTitle, 8);
+            const st = new Soundtracks(tracks);
+            soundtrackHtml = st.render();
+        } catch {
+            soundtrackHtml = '';
+        }
     }
 
     // Render the popup content
@@ -515,6 +529,7 @@ async function showDetails(mal_id, type) {
             </div>
         `).join('')}
         </div>
+        ${soundtrackHtml}
     `;
 }
 

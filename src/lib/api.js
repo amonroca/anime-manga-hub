@@ -454,3 +454,32 @@ export async function getAnimeEpisodes(mal_id, page = 1) {
     return [];
   }
 }
+
+// iTunes Search API: fetch soundtrack tracks for a given title
+/**
+ * Search iTunes for soundtrack tracks matching the given title.
+ * Strategy: try "<title> soundtrack" then "<title> ost" then "<title>"; pick tracks with previewUrl.
+ * @param {string} title
+ * @param {number} [limit=10]
+ * @returns {Promise<Array<{trackId:number,trackName:string,artistName:string,collectionName?:string,artworkUrl100?:string,previewUrl?:string}>>}
+ */
+export async function getSoundtracks(title, limit = 10) {
+  if (!title) return [];
+  const terms = [
+    `${title} soundtrack`,
+    `${title} ost`,
+    `${title}`
+  ];
+  for (const term of terms) {
+    try {
+      const url = `https://itunes.apple.com/search?media=music&entity=song&limit=${encodeURIComponent(String(limit))}&term=${encodeURIComponent(term)}`;
+      const res = await rateLimitedFetch(url);
+      const data = await safeJson(res);
+      const results = (data.results || []).filter(r => r.previewUrl);
+      if (results.length) return results;
+    } catch {
+      // continue to next term
+    }
+  }
+  return [];
+}
