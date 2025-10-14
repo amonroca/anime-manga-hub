@@ -11,7 +11,7 @@ import AnimeRecommendation from '../components/AnimeRecommendation.mjs';
 import MangaRecommendation from '../components/MangaRecommendation.mjs';
 import { getCharacters, getDetails, getAnimeStreamingLinks, getRecentAnimeRecommendations, getAnimeRecommendation, 
     getRecentMangaRecommendations, getMangaRecommendation, getAnimeGenres, getMangaGenres, getAnimeNews, getMangaNews,
-    getSeasonUpcoming, getSoundtracks } from "./api";
+    getSeasonUpcoming, getSoundtracks, getOfficialMangaLinks } from "./api";
 import Soundtracks from '../components/Soundtracks.mjs';
 
 /**
@@ -175,10 +175,51 @@ export function addToWatchlist(item) {
         url: item.url,
         });
         localStorage.setItem('watchlist', JSON.stringify(list));
-        alert('Added to the watchlist!');
+        showToast('Added to the watchlist!', 'success');
     } else {
-        alert('Already in the watchlist!');
+        showToast('Already in the watchlist!', 'info');
     }
+}
+
+/**
+ * Lightweight toast notifications
+ * @param {string} message
+ * @param {'info'|'success'|'error'} [type='info']
+ */
+function showToast(message, type = 'info') {
+    const container = getToastContainer();
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    toast.textContent = message;
+
+    // Click to dismiss early
+    toast.addEventListener('click', () => {
+        toast.classList.add('toast-hide');
+        setTimeout(() => toast.remove(), 200);
+    });
+
+    container.appendChild(toast);
+    // Animate in
+    requestAnimationFrame(() => toast.classList.add('toast-show'));
+
+    // Auto-dismiss
+    setTimeout(() => {
+        toast.classList.remove('toast-show');
+        toast.classList.add('toast-hide');
+        setTimeout(() => toast.remove(), 200);
+    }, 3000);
+}
+
+function getToastContainer() {
+    let el = document.getElementById('toast-container');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'toast-container';
+        document.body.appendChild(el);
+    }
+    return el;
 }
 
 /**
@@ -485,6 +526,8 @@ async function showDetails(mal_id, type) {
     let animeStreaming = '';
     let animeEpisodes = '';
     let soundtrackHtml = '';
+    let whereToReadHtml = '';
+    let relatedHtml = '';
 
     // Check if trailer exists and set up HTML
     if (details.trailer?.embed_url) {
@@ -511,6 +554,41 @@ async function showDetails(mal_id, type) {
         } catch {
             soundtrackHtml = '';
         }
+    } else if (type === 'manga') {
+        // Where to Read (official) via Jikan + AniList aggregation
+        try {
+            const title = details.title_english || details.title || details.title_japanese || '';
+            const links = await getOfficialMangaLinks(mal_id, title);
+            if (links.length) {
+                whereToReadHtml = `<h4>Where to read</h4><p>${links.map(l => `<a href="${l.url}" target="_blank" rel="noopener noreferrer">${l.label}</a>`).join(' | ')}</p>`;
+            } else if (title) {
+                const fallback = `https://www.google.com/search?q=${encodeURIComponent(`${title} official manga read`)}`;
+                whereToReadHtml = `<h4>Where to read</h4><p><a class="where-fallback" href="${fallback}" target="_blank" rel="noopener noreferrer">Search official sources for “${title}”</a></p>`;
+            }
+        } catch { whereToReadHtml = '' }
+
+        // Related (only for manga)
+        if (Array.isArray(details.relations) && details.relations.length) {
+            try {
+                const items = details.relations.flatMap(rel =>
+                    (rel.entry || []).map(e => ({ relation: rel.relation, entry: e }))
+                ).slice(0, 10);
+                if (items.length) {
+                    relatedHtml = `
+                        <!--<section class="related-section">-->
+                          <h4>Related</h4>
+                          <ul class="related-list">
+                            ${items.map(it => {
+                                const name = it.entry?.name || it.entry?.title || 'Unknown';
+                                const url = it.entry?.url || '#';
+                                const relation = it.relation || '';
+                                return `<li class="related-item"><span class="rel-badge">${relation}</span><a href="${url}" target="_blank" rel="noopener noreferrer">${name}</a></li>`;
+                            }).join('')}
+                          </ul>
+                        <!--</section>-->`;
+                }
+            } catch { relatedHtml = '' }
+        }
     }
 
     // Render the popup content
@@ -520,6 +598,7 @@ async function showDetails(mal_id, type) {
         ${trailerEmbed}
         ${animeStreaming}
         ${animeEpisodes}
+        ${whereToReadHtml}
         <h4>Characters</h4>
         <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
         ${characters.map(c => `
@@ -530,6 +609,7 @@ async function showDetails(mal_id, type) {
         `).join('')}
         </div>
         ${soundtrackHtml}
+        ${relatedHtml}
     `;
 }
 

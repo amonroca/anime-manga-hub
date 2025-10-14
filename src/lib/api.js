@@ -483,3 +483,95 @@ export async function getSoundtracks(title, limit = 10) {
   }
   return [];
 }
+
+// Jikan: external links for a manga by MAL ID
+/**
+ * Retrieve external links for a manga by MAL ID via Jikan.
+ * @param {number|string} mal_id
+ * @returns {Promise<Array<{name?:string,url:string}>>}
+ */
+export async function getMangaExternalLinksJikan(mal_id) {
+  try {
+    const res = await rateLimitedFetch(`${JIKAN_BASE}/manga/${mal_id}/external`);
+    const data = await safeJson(res);
+    return data.data || [];
+  } catch {
+    return [];
+  }
+}
+
+// AniList GraphQL: external links for a manga by MAL ID
+/**
+ * Retrieve external links for a manga by MAL ID via AniList GraphQL.
+ * @param {number} mal_id
+ * @returns {Promise<Array<{site?:string,url:string,type?:string,language?:string}>>}
+ */
+export async function getMangaExternalLinksAniListByMal(mal_id) {
+  if (!mal_id && mal_id !== 0) return [];
+  const query = `query ($idMal: Int) { Media(idMal: $idMal, type: MANGA) { externalLinks { site url type language isDisabled } } }`;
+  const body = JSON.stringify({ query, variables: { idMal: Number(mal_id) } });
+  try {
+    const res = await rateLimitedFetch('https://graphql.anilist.co', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body
+    });
+    const data = await safeJson(res);
+    return data?.data?.Media?.externalLinks || [];
+  } catch {
+    return [];
+  }
+}
+
+// Aggregate and filter official links from Jikan + AniList
+/**
+ * Combine Jikan and AniList external links and filter to official/retailer domains.
+ * @param {number|string} mal_id
+ * @param {string} [title]
+ * @returns {Promise<Array<{label:string,url:string,host:string}>>}
+ */
+export async function getOfficialMangaLinks(mal_id, title = '') {
+  const preferredHosts = [
+    'mangaplus.shueisha.co.jp',
+    'viz.com', 'www.viz.com', 'manga.viz.com',
+    'yenpress.com',
+    'kodansha.us', 'kodansha.com',
+    'global.bookwalker.jp', 'bookwalker.jp',
+    'www.crunchyroll.com', 'crunchyroll.com',
+    'azuki.co',
+    'www.comixology.com', 'comixology.com',
+    'sevenseasentertainment.com'
+  ];
+
+  const [jk, al] = await Promise.all([
+    getMangaExternalLinksJikan(mal_id),
+    getMangaExternalLinksAniListByMal(Number(mal_id))
+  ]);
+
+  const raw = [
+    ...(jk || []).map(l => ({ label: l.name || l.url, url: l.url })),
+    ...(al || []).map(l => ({ label: l.site || l.url, url: l.url }))
+  ];
+
+  const filtered = raw.filter(item => {
+    try {
+      const u = new URL(item.url);
+      return preferredHosts.includes(u.hostname);
+    } catch { return false; }
+  });
+
+  // Dedupe by hostname + pathname
+  const seen = new Set();
+  const result = [];
+  for (const it of filtered) {
+    try {
+      const u = new URL(it.url);
+      const key = `${u.hostname}${u.pathname}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        result.push({ label: it.label, url: it.url, host: u.hostname });
+      }
+    } catch { /* ignore bad urls */ }
+  }
+  return result.slice(0, 8);
+}
