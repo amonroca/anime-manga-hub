@@ -455,6 +455,26 @@ export async function getAnimeEpisodes(mal_id, page = 1) {
   }
 }
 
+/**
+ * Retrieve episodes with pagination metadata for a given anime (Jikan v4).
+ * Keeps the old getAnimeEpisodes intact while exposing pagination info.
+ * @param {number|string} mal_id
+ * @param {number} [page=1]
+ * @returns {Promise<{data: any[], pagination: {has_next_page?: boolean, last_visible_page?: number, current_page?: number, items?: any}}>} 
+ */
+export async function getAnimeEpisodesPaged(mal_id, page = 1) {
+  try {
+    const res = await rateLimitedFetch(`${JIKAN_BASE}/anime/${mal_id}/episodes?page=${page}`);
+    const json = await safeJson(res);
+    return {
+      data: json?.data || [],
+      pagination: json?.pagination || {}
+    };
+  } catch {
+    return { data: [], pagination: {} };
+  }
+}
+
 // iTunes Search API: fetch soundtrack tracks for a given title
 /**
  * Search iTunes for soundtrack tracks matching the given title.
