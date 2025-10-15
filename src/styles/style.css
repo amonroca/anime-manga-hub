@@ -739,20 +739,70 @@ button:not(.menu-toggle):focus-visible {
 .home .news-card .news-meta { display: flex; gap: 1rem; margin-top: 0.3rem; align-items: center; }
 
 /* Upcoming release card styling (used on home) */
-.home .release-card { background: #31343b; border-radius: 10px; padding: 1rem; box-shadow: 0 2px 8px #0003; }
+.home .release-card { background: transparent; border-radius: 10px; padding: 0; box-shadow: none; }
 .home .upcoming-card {
-  position: relative; background: #232526; border-radius: 14px; box-shadow: 0 2px 12px #0003;
-  min-width: 180px; max-width: 200px; display: flex; flex-direction: column; align-items: center;
-  margin-right: 1.2rem; overflow: hidden; transition: box-shadow 0.2s; top: 1rem; left: 0.7rem; padding-bottom: 0.7rem;
+  position: relative;
+  background: #232526;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px #0004;
+  min-width: 180px;
+  max-width: 210px;
+  display: flex;
+  flex-direction: column;
+  margin-right: 0.9rem;
+  overflow: hidden;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
-.home .upcoming-card img { width: 100%; height: 285px; object-fit: cover; border-radius: 14px 14px 0 0; box-shadow: 0 2px 8px #0002; }
-.home .upcoming-card .release-date { position: absolute; top: 10px; left: 16%; background: #aaa; color: #232526; font-weight: bold; font-size: 1.05rem; padding: 0.3em 0.7em; border-radius: 8px; box-shadow: 0 2px 8px #0002; z-index: 2; }
-.home .upcoming-card .upcoming-title { font-size: 1.08rem; font-weight: bold; color: #fff; text-align: center; margin: 0.7rem 0 0.3rem 0; padding: 0 0.5rem; word-break: break-word; }
-.home .upcoming-card .upcoming-type { font-size: 0.95rem; color: #b3b3b3; margin-bottom: 0.3rem; text-align: center; }
-.home .upcoming-card .upcoming-synopsis { font-size: 0.92rem; color: #ccc; margin-bottom: 0.7rem; padding: 0 0.5rem; text-align: center; max-height: 3.5em; overflow: hidden; }
-.home .upcoming-card .upcoming-rating { text-align: center; font-size: 0.9rem; color: #b3b3b3; margin-top: 0.3rem; }
-.home .upcoming-card .upcoming-trailer { padding: 0.4em 1em; border-radius: 8px; }
-.home .upcoming-card:hover { box-shadow: 0 8px 32px #646cff55; }
+.home .upcoming-card:hover { box-shadow: 0 8px 24px #0006; transform: translateY(-2px); }
+.home .upcoming-card .upcoming-media { position: relative; }
+.home .upcoming-card img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  display: block;
+}
+.home .upcoming-card .upcoming-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.05), rgba(0,0,0,0.18));
+  pointer-events: none;
+}
+.home .upcoming-card .release-date {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .78rem;
+  -webkit-backdrop-filter: saturate(120%) blur(1.5px);
+  backdrop-filter: saturate(120%) blur(1.5px);
+}
+.home .upcoming-card .upcoming-body { padding: .55rem .6rem .65rem; display: grid; gap: .35rem; }
+.home .upcoming-title { font-size: .98rem; line-height: 1.25; margin: 0; text-align: center; }
+.home .upcoming-title a { color: #fff; text-decoration: none; }
+.home .upcoming-title a:hover, .home .upcoming-title a:focus { text-decoration: underline; }
+.home .upcoming-title { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.home .upcoming-meta { display: flex; flex-wrap: wrap; gap: .35rem; justify-content: center; }
+.home .upcoming-meta .chip {
+  font-size: .72rem;
+  line-height: 1;
+  color: #cfcfcf;
+  background: #2f3240;
+  border: 1px solid #3d4155;
+  padding: .28rem .45rem;
+  border-radius: 999px;
+}
+.home .upcoming-meta .chip.type-tv { background: #1e293b; border-color: #334155; color: #bfdbfe; }
+.home .upcoming-meta .chip.type-movie { background: #2a1f3a; border-color: #4c1d95; color: #e9d5ff; }
+.home .upcoming-meta .chip.type-ova { background: #052e2b; border-color: #065f46; color: #99f6e4; }
+.home .upcoming-meta .chip.type-ona { background: #312e81; border-color: #4338ca; color: #c7d2fe; }
+.home .upcoming-meta .chip.type-special { background: #7c2d12; border-color: #9a3412; color: #ffedd5; }
+.home .upcoming-meta .chip.type-music { background: #1e1b4b; border-color: #3730a3; color: #c7d2fe; }
+.home .upcoming-trailer { display: none; }
 
 /* Disabled button utility (used across components) */
 .home .btn-disabled { background: #555 !important; cursor: not-allowed !important; }

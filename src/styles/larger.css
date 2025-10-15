@@ -56,6 +56,8 @@
   .home .carousel-item .card-image { height: 320px; }
   .home .carousel-item .card-title { font-size: 1.08rem; padding: 0.3em 0.8em; left: 30%; transform: translateX(-25%); min-width: 158px; }
   .home .carousel-item .card-desc { font-size: 0.97rem; padding: 0.7rem 1rem 1rem 1rem; }
+  /* Upcoming releases cards wider on desktop for better balance */
+  .home .upcoming-card { min-width: 210px; max-width: 240px; margin-right: 1.1rem; }
 }
 
 /* Increase paddings on wider screens (>=600px) */

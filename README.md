@@ -2,6 +2,10 @@
 
 A lightweight hub to explore anime and manga using the Jikan v4 API, with Kitsu as a fallback for upcoming releases. Built with Vite (MPA) and ES Modules.
 
+## Live Site
+
+Production: https://anime-manga-hub.vercel.app/
+
 ## Features
 
 - Search anime or manga with filters
