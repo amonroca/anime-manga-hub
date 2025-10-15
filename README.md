@@ -18,14 +18,14 @@ A lightweight hub to explore anime and manga using the Jikan v4 API, with Kitsu 
 
 ## Architecture
 
-High level
+High-level
 
 - Presentation: vanilla JS modules + small UI components (cards, lists, badges, footer)
 - Library (domain): API client with global rate limiter, utilities for rendering/state
 - Data: small static assets like the navigation menu JSON
-- Build: Vite in MPA mode (multi HTML entries)
+- Build: Vite in MPA mode (multiple HTML entries)
 
-Flow (happy path)
+Flow (Happy Path)
 
 1. Page entry (`src/js/*.js`) wires header/footer and page-specific logic
 2. UI components (`src/components/*`) render HTML snippets (no side effects)
@@ -35,7 +35,7 @@ Flow (happy path)
    - Per-minute cap
    - Retries for 429/5xx with backoff, honoring `Retry-After` when present
 
-Decisions & trade-offs
+Decisions & Trade-offs
 
 - Keep it framework-free (vanilla ESM) for small footprint and transparency
 - Centralized rate limiting prevents scattered throttles and reduces 429
@@ -54,7 +54,7 @@ src/
   *.html            # Pages (MPA entries)
 ```
 
-Key modules/components
+Key Modules and Components
 
 - `src/lib/api.js`: API access with a global rate limiter
 - `src/lib/utils.js`: rendering, storage and UI helpers
@@ -62,7 +62,7 @@ Key modules/components
 - `src/js/Menu.mjs`: responsive nav (hamburger + desktop) fed by `src/data/menu.json`
 - `src/styles/style.css` (base), `src/styles/larger.css` (overrides)
 
-## Episodes: usage
+## Episodes: Usage
 
 The episodes page requires query parameters to identify the anime:
 
@@ -81,12 +81,55 @@ Notes:
 - The page syncs the current page to the URL (pushState) and supports back/forward navigation (popstate).
 - When parameters are missing, the page shows a friendly message and disables pagination.
 
-## APIs used
+## APIs Used
 
 - Jikan v4 — primary data source (anime/manga, episodes, characters, external links)
 - AniList GraphQL — used to enrich manga external links (official sources)
 - iTunes Search API — used to fetch anime soundtracks with preview
 - Kitsu — fallback source for upcoming releases
+
+## API Coverage Map (UI ↔ Endpoints)
+
+- Search (results list)
+
+  - Endpoints: Jikan `GET /v4/anime?q=…`, `GET /v4/manga?q=…`
+  - Code: `searchJikan()` in `src/lib/api.js` → render via `renderResults()` in `src/lib/utils.js` with `AnimeCard`/`MangaCard`.
+
+- Details popup (anime)
+
+  - Endpoints: Jikan `GET /v4/anime/{id}/full` (details + trailer), `GET /v4/anime/{id}/characters`, `GET /v4/anime/{id}/streaming`
+  - Extras: iTunes Search API for soundtracks (`getSoundtracks()`)
+  - Code: `getDetails()`, `getCharacters()`, `getAnimeStreamingLinks()` in `src/lib/api.js`; assembled in `showDetails()` in `src/lib/utils.js` and component `Soundtracks.mjs`.
+
+- Details popup (manga)
+
+  - Endpoints: Jikan `GET /v4/manga/{id}/full` (relations for “Related”), `GET /v4/manga/{id}/external`
+  - Extras: AniList GraphQL `externalLinks` by `idMal` for official reading sources
+  - Code: `getDetails()`, `getMangaExternalLinksJikan()`, `getMangaExternalLinksAniListByMal()`, aggregator `getOfficialMangaLinks()` in `src/lib/api.js`; rendering in `showDetails()` (`src/lib/utils.js`).
+
+- Recommendations (anime/manga)
+
+  - Endpoints: Jikan `GET /v4/recommendations/anime`, `GET /v4/anime/{id}/recommendations`, `GET /v4/recommendations/manga`, `GET /v4/manga/{id}/recommendations`
+  - Code: `getRecentAnimeRecommendations()`, `getAnimeRecommendation()`, `getRecentMangaRecommendations()`, `getMangaRecommendation()` in `src/lib/api.js`; render `renderRecommendations()` in `src/lib/utils.js` with `AnimeRecommendation`/`MangaRecommendation`.
+
+- News (anime/manga)
+
+  - Endpoints: Jikan `GET /v4/anime/{id}/news`, `GET /v4/manga/{id}/news`
+  - Code: `getAnimeNews()`, `getMangaNews()` → `renderNewsList()` in `src/lib/utils.js` with `AnimeNews`/`MangaNews`.
+
+- Upcoming releases
+
+  - Endpoints: Jikan `GET /v4/seasons/upcoming?page=N` (with Kitsu fallback when needed)
+  - Code: `getSeasonUpcoming()` and `getKitsuUpcomingAnime()` in `src/lib/api.js`; collection and filtering in `renderUpcomingReleases()` (`src/lib/utils.js`).
+
+- Genres (filtros)
+
+  - Endpoints: Jikan `GET /v4/genres/anime?filter=genres`, `GET /v4/genres/manga?filter=genres`
+  - Code: `getAnimeGenres()`, `getMangaGenres()` → `fillGenresFilter()` in `src/lib/utils.js`.
+
+- Episodes page
+  - Endpoints: Jikan `GET /v4/anime/{id}/episodes?page=N` (with pagination metadata)
+  - Code: `getAnimeEpisodesPaged()` in `src/lib/api.js`; orchestration and URL sync in `src/js/episodes.js`; item rendering in `renderEpisodesList()` (`src/lib/utils.js`).
 
 ## Scripts
 
@@ -97,9 +140,9 @@ Notes:
 Notes
 
 - PDF generation was removed; there is no `npm run pdf` script anymore
-- MPA inputs are configured in `vite.config.js`
+- MPA entries are configured in `vite.config.js`
 
-## Getting started
+## Getting Started
 
 1. Install dependencies
 
@@ -125,14 +168,14 @@ npm run build
 npm run preview
 ```
 
-## Implementation notes
+## Implementation Notes
 
 - Rate limiting: all Jikan calls go through a global queue (min interval, per-minute cap, retries on 429/5xx, honors `Retry-After`)
 - Accessibility: consistent headings, proper labels, hamburger `aria-expanded`, close on Escape and link click. Episodes page adds `aria-live` announcements, `aria-busy` while loading, and focus is moved to the heading upon page change.
 - State: favorites/watchlist in localStorage; details/pagination cache in sessionStorage
 - CSS: mobile-first base + `@supports`-guarded scrollbar styling with WebKit fallback. Theme color updated for better contrast (`#4f46e5`, hover `#4338CA`).
 
-## Recent changes (highlights)
+## Recent Changes (Highlights)
 
 - Episodes pagination implemented with URL sync and accessible controls
 - Non-blocking toast notifications replaced `alert()` in watchlist actions
@@ -142,7 +185,7 @@ npm run preview
 - Close button tap highlight removed; subtle focus-visible outline retained
 - Contrast improvements across buttons/badges and text
 
-## Menu structure
+## Menu Structure
 
 Defined in `src/data/menu.json`:
 
@@ -164,6 +207,11 @@ Defined in `src/data/menu.json`:
   }
 ]
 ```
+
+## Project Management (Trello)
+
+- Board: https://trello.com/b/OxXu15iK/anime-manga-hub
+- Notes: The board documents tasks and progress (e.g., Backlog → In Progress → Done) with labels and due dates where relevant. If access is restricted, ensure the board is shared with read access for reviewers.
 
 ## Troubleshooting
 

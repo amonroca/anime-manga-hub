@@ -1,14 +1,17 @@
 // List item template for a single episode. Used in the Episodes page.
-// Displays episode number, title, aired date, filler/recap flags, and actions.
+// Now includes compact badges for aired date, filler, and recap to expose more JSON fields clearly.
 function episodeTemplate(episode) {
+  const airedLabel = episode.aired ? new Date(episode.aired).toLocaleDateString() : null;
   return `
     <li class="episode-item">
       <div class="episode-number">Episode ${episode.mal_id}</div>
       <div class="episode-title">${episode.title || 'No title available'}</div>
-      <div class="episode-aired">${episode.aired ? new Date(episode.aired).toLocaleDateString() : 'Aired date unknown'}</div>
-      <div class="episode-filler">${episode.filler ? 'Filler Episode' : ''}</div>
-      <div class="episode-recap">${episode.recap ? 'Recap Episode' : ''}</div>
-      <a href="${episode.url}" target="_blank" rel="noopener" class="episode-link">Watch Episode</a>
+      <div class="episode-badges">
+        ${airedLabel ? `<span class="ep-badge ep-badge--aired" title="Aired">${airedLabel}</span>` : `<span class="ep-badge ep-badge--unaired" title="Aired">Unknown</span>`}
+        ${episode.filler ? `<span class="ep-badge ep-badge--filler" title="Filler episode">Filler</span>` : ''}
+        ${episode.recap ? `<span class="ep-badge ep-badge--recap" title="Recap episode">Recap</span>` : ''}
+      </div>
+      <a href="${episode.url}" target="_blank" rel="noopener noreferrer" class="episode-link" aria-label="Open episode on MyAnimeList">Watch Episode</a>
       <button type="button" id="add-watchlist-btn" class="button" data-episode-id="${episode.mal_id}">Add to Watchlist</button>
     </li>
   `;

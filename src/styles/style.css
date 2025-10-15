@@ -497,26 +497,17 @@ button:not(.menu-toggle):focus-visible {
   color: #646cff;
   font-size: 1.1rem;
 }
+.episode-badges { display: flex; justify-content: center; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.2rem; }
+.ep-badge { display: inline-block; font-size: 0.78rem; padding: 0.18rem 0.5rem; border-radius: 999px; color: #fff; box-shadow: 0 2px 6px #0003; }
+.ep-badge--aired { background: #2563eb; }
+.ep-badge--unaired { background: #6b7280; }
+.ep-badge--filler { background: #ff6a00; }
+.ep-badge--recap { background: #4f46e5; }
 .episode-title {
   font-size: 1.08rem;
   font-weight: bold;
   color: #fff;
   margin-bottom: 0.2rem;
-}
-.episode-aired {
-  font-size: 0.9rem;
-  color: #aaa;
-  margin-right: 1rem;
-}
-.episode-filler {
-  font-size: 0.9rem;
-  color: #ff6a00;
-  font-style: italic;
-}
-.episode-recap {
-  font-size: 0.9rem;
-  color: #2563eb;
-  font-style: italic;
 }
 .episode-link {
   color: #646cff;
